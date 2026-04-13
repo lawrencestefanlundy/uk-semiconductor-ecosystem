@@ -20,7 +20,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; back
 .container { max-width: 100%; width: 94vw; margin: 0 auto; padding: 0 1rem; }
 
 /* Stats — 7 cards */
-.stats { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #E2E8F0; border-radius: 12px; overflow: hidden; margin: -1.5rem 0 1.75rem; position: relative; z-index: 1; box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04); }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #E2E8F0; border-radius: 12px; overflow: hidden; margin: -1.5rem 0 1.75rem; position: relative; z-index: 1; box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04); }
 .stat { background: #FFFFFF; padding: 1.25rem 0.75rem; cursor: pointer; transition: all 0.15s; text-align: center; }
 .stat:hover { background: #F8FAFC; transform: translateY(-1px); }
 .stat.active-filter { background: #F0FDFA; }
@@ -83,6 +83,15 @@ tr:hover td { background: #F8FAFC; }
 .dot-other { background: #94A3B8; }
 .status-text { font-size: 0.72rem; color: #64748B; }
 
+/* Row hover tooltip */
+tr { position: relative; }
+.row-tip { display: none; position: absolute; left: 0; bottom: 100%; z-index: 20; background: #0F172A; color: #CBD5E1; padding: 0.75rem 1rem; border-radius: 10px; font-size: 0.75rem; line-height: 1.55; width: max-content; max-width: 480px; box-shadow: 0 8px 24px rgba(0,0,0,0.18); pointer-events: none; }
+.row-tip .tip-name { color: #FFFFFF; font-weight: 600; font-size: 0.8rem; margin-bottom: 0.3rem; }
+.row-tip .tip-row { display: flex; gap: 0.35rem; }
+.row-tip .tip-label { color: #94A3B8; min-width: 65px; flex-shrink: 0; }
+.row-tip .tip-val { color: #E2E8F0; }
+tr:hover .row-tip { display: block; }
+
 .footer { padding: 2rem; text-align: center; }
 .footer-toggle { font-size: 0.75rem; color: #94A3B8; cursor: pointer; border: none; background: none; font-family: inherit; }
 .footer-toggle:hover { color: #64748B; }
@@ -135,17 +144,9 @@ tr:hover td { background: #F8FAFC; }
     <div class="num">213</div>
     <div class="label">Companies</div>
   </div>
-  <div class="stat" onclick="filterStat('Active', this)">
-    <div class="num">183</div>
-    <div class="label">Active Private</div>
-  </div>
-  <div class="stat" onclick="filterStat('funded', this)">
-    <div class="num">90</div>
-    <div class="label">With Funding</div>
-  </div>
   <div class="stat" onclick="filterStat('all', this)">
     <div class="num">&pound;2.74B</div>
-    <div class="label">Disclosed Raised</div>
+    <div class="label">Raised</div>
   </div>
   <div class="stat" onclick="filterStat('spinout', this)">
     <div class="num">97</div>
@@ -154,10 +155,6 @@ tr:hover td { background: #F8FAFC; }
   <div class="stat" onclick="filterStat('Public', this)">
     <div class="num">10</div>
     <div class="label">Public</div>
-  </div>
-  <div class="stat" onclick="filterStat('Acquired', this)">
-    <div class="num">13</div>
-    <div class="label">Acquired</div>
   </div>
 </div>
 
@@ -340,14 +337,49 @@ function renderTable() {
   filtered.forEach(c => {
     const tr = document.createElement('tr');
 
-    // Company
+    // Company + hover tooltip
     const td0 = document.createElement('td');
     td0.className = 'company-name';
+    td0.style.position = 'relative';
     if (c.website) {
       const a = document.createElement('a');
       a.href = c.website; a.target = '_blank'; a.textContent = c.name;
       td0.appendChild(a);
     } else { td0.textContent = c.name; }
+
+    // Build hover tooltip
+    const tip = document.createElement('div');
+    tip.className = 'row-tip';
+    const tipName = document.createElement('div');
+    tipName.className = 'tip-name';
+    tipName.textContent = c.name;
+    tip.appendChild(tipName);
+    const tipFields = [
+      ['Desc', c.description],
+      ['Category', c.category],
+      ['Origin', c.origin],
+      ['City', c.city],
+      ['Stage', stageLabel(c.stage)],
+      ['Raised', c.raised],
+      ['Founded', c.founded],
+      ['Employees', c.employees],
+      ['Status', c.status],
+    ];
+    tipFields.forEach(function(f) {
+      if (!f[1]) return;
+      const row = document.createElement('div');
+      row.className = 'tip-row';
+      const lbl = document.createElement('span');
+      lbl.className = 'tip-label';
+      lbl.textContent = f[0];
+      const val = document.createElement('span');
+      val.className = 'tip-val';
+      val.textContent = f[1];
+      row.appendChild(lbl);
+      row.appendChild(val);
+      tip.appendChild(row);
+    });
+    td0.appendChild(tip);
     tr.appendChild(td0);
 
     // City

@@ -17,7 +17,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; back
 .header-title .flag { font-size: 2rem; }
 .header h1 { font-size: 1.85rem; font-weight: 700; color: #FFFFFF; letter-spacing: -0.02em; }
 .header .subtitle { font-size: 0.88rem; color: #94A3B8; font-weight: 400; }
-.container { max-width: 1800px; width: 100%; margin: 0 auto; padding: 0 clamp(0.75rem, 2vw, 3rem); overflow: hidden; }
+.container { max-width: 1800px; width: 100%; margin: 0 auto; padding: 0 clamp(0.75rem, 2vw, 3rem); }
 
 
 .charts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.25rem; margin-bottom: 1.5rem; }
@@ -25,7 +25,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; back
 .chart-wrap h2 { font-size: 0.92rem; font-weight: 600; color: #1E293B; letter-spacing: -0.01em; margin-bottom: 1rem; }
 .chart-wrap canvas { height: 340px !important; }
 
-.section { background: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; }
+.section { background: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
 .filters { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; padding: 1.1rem 1.5rem; border-bottom: 1px solid #F1F5F9; }
 .filter-input { padding: 0.5rem 0.75rem; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 0.88rem; font-family: inherit; color: #334155; background: #FFFFFF; outline: none; transition: border-color 0.15s; }
 .filter-input:focus { border-color: #0D9488; box-shadow: 0 0 0 3px rgba(13,148,136,0.1); }
@@ -37,19 +37,19 @@ select.filter-input { min-width: 130px; max-width: 100%; cursor: pointer; }
 .clear-btn:hover { background: #F1F5F9; color: #334155; }
 
 .table-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
 thead { position: sticky; top: 0; z-index: 2; }
-th { background: #F8FAFC; padding: 0.7rem 0.75rem; text-align: left; font-weight: 600; color: #64748B; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #E2E8F0; cursor: pointer; white-space: nowrap; user-select: none; }
+th { background: #F8FAFC; padding: 0.6rem 0.6rem; text-align: left; font-weight: 600; color: #64748B; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #E2E8F0; cursor: pointer; white-space: nowrap; user-select: none; }
 th:hover { color: #334155; }
 th .sort-arrow { opacity: 0.3; margin-left: 2px; font-size: 0.65rem; }
 th.sorted .sort-arrow { opacity: 1; }
-td { padding: 0.65rem 0.75rem; border-bottom: 1px solid #F1F5F9; vertical-align: top; color: #334155; }
+td { padding: 0.55rem 0.6rem; border-bottom: 1px solid #F1F5F9; vertical-align: top; color: #334155; }
 tr:hover td { background: #F8FAFC; }
 .company-name { font-weight: 500; color: #0F172A; white-space: nowrap; font-size: 0.92rem; }
 .company-name a { color: #0F172A; text-decoration: none; }
 .company-name a:hover { color: #0D9488; }
 .desc-cell { color: #64748B; line-height: 1.4; }
-.origin-cell { color: #64748B; font-size: 0.82rem; white-space: nowrap; }
+.origin-cell { color: #64748B; font-size: 0.82rem; }
 
 .badge { display: inline-block; padding: 0.2rem 0.55rem; border-radius: 100px; font-size: 0.78rem; font-weight: 500; white-space: nowrap; }
 .badge-ai-chips-accelerators { background: #E8EEF5; color: #1E3A5F; }
@@ -191,7 +191,7 @@ tr:hover td { background: #F8FAFC; }
     <div class="acq-item"><span class="acq-name">Dialog Semiconductor</span><span class="acq-year">2021</span><span class="acq-buyer">&#127471;&#127477; Renesas &pound;4.9B</span></div>
     <div class="acq-item"><span class="acq-name">Newport Wafer Fab</span><span class="acq-year">2021</span><span class="acq-buyer">&#127464;&#127475; Nexperia &pound;63M</span></div>
     <div class="acq-item"><span class="acq-name">Sivers Photonics</span><span class="acq-year">2021</span><span class="acq-buyer">&#127480;&#127466; Sivers Semiconductors</span></div>
-    <div class="acq-item"><span class="acq-name">XMOS</span><span class="acq-year">2024</span><span class="acq-buyer">&#127471;&#127477; Infineon</span></div>
+    <div class="acq-item"><span class="acq-name">XMOS</span><span class="acq-year">2024</span><span class="acq-buyer">&#127465;&#127466; Infineon</span></div>
     <p style="font-size:0.75rem;color:#94A3B8;margin-top:0.75rem;line-height:1.4;">Foreign acquisition of UK semiconductor assets remains a strategic concern. The National Security and Investment Act 2021 now screens such deals.</p>
   </div>
 </div>

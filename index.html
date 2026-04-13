@@ -11,26 +11,28 @@
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #F8FAFC; color: #1E293B; line-height: 1.5; -webkit-font-smoothing: antialiased; }
 
-.header { background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 2rem 0 1.75rem; }
-.header-inner { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
-.header h1 { font-size: 1.4rem; font-weight: 700; color: #0F172A; letter-spacing: -0.02em; }
-.header .subtitle { font-size: 0.825rem; color: #64748B; font-weight: 400; }
+.header { background: #0F172A; padding: 2.25rem 0 2rem; }
+.header-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+.header-title { display: flex; align-items: center; gap: 0.65rem; }
+.header-title .flag { font-size: 1.6rem; }
+.header h1 { font-size: 1.35rem; font-weight: 700; color: #FFFFFF; letter-spacing: -0.02em; }
+.header .subtitle { font-size: 0.8rem; color: #94A3B8; font-weight: 400; }
 .container { max-width: 100%; width: 94vw; margin: 0 auto; padding: 0 1rem; }
 
-/* Stats — 7 cards now */
-.stats { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #E2E8F0; border-radius: 12px; overflow: hidden; margin: 1.75rem 0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
-.stat { background: #FFFFFF; padding: 1.25rem 0.75rem; cursor: pointer; transition: background 0.15s; text-align: center; }
-.stat:hover { background: #F8FAFC; }
+/* Stats — 7 cards */
+.stats { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #E2E8F0; border-radius: 12px; overflow: hidden; margin: -1.5rem 0 1.75rem; position: relative; z-index: 1; box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04); }
+.stat { background: #FFFFFF; padding: 1.25rem 0.75rem; cursor: pointer; transition: all 0.15s; text-align: center; }
+.stat:hover { background: #F8FAFC; transform: translateY(-1px); }
 .stat.active-filter { background: #F0FDFA; }
 .stat .num { font-size: 1.4rem; font-weight: 700; color: #0F172A; letter-spacing: -0.02em; }
 .stat .label { font-size: 0.65rem; color: #94A3B8; margin-top: 0.25rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 500; }
 
 .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem; }
-.chart-wrap { background: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; padding: 1.25rem 1.5rem 1.5rem; }
+.chart-wrap { background: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; padding: 1.25rem 1.5rem 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
 .chart-wrap h2 { font-size: 0.78rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem; }
 .chart-wrap canvas { height: 320px !important; }
 
-.section { background: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; margin-bottom: 1.25rem; }
+.section { background: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; margin-bottom: 1.25rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
 .filters { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; padding: 1rem 1.5rem; border-bottom: 1px solid #F1F5F9; }
 .filter-input { padding: 0.45rem 0.65rem; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 0.78rem; font-family: inherit; color: #334155; background: #FFFFFF; outline: none; transition: border-color 0.15s; }
 .filter-input:focus { border-color: #0D9488; box-shadow: 0 0 0 3px rgba(13,148,136,0.1); }
@@ -117,7 +119,10 @@ tr:hover td { background: #F8FAFC; }
 <div class="header">
 <div class="container">
 <div class="header-inner">
-  <h1>UK Semiconductor, Photonics & Quantum Ecosystem</h1>
+  <div class="header-title">
+    <span class="flag">&#127468;&#127463;</span>
+    <h1>UK Semiconductor, Photonics & Quantum Ecosystem</h1>
+  </div>
   <span class="subtitle">213 companies &middot; 15 categories &middot; April 2026</span>
 </div>
 </div>
@@ -451,6 +456,10 @@ Chart.defaults.font.size = 11;
 Chart.defaults.color = '#64748B';
 Chart.defaults.maintainAspectRatio = false;
 Chart.defaults.animation = { duration: 800, easing: 'easeOutQuart' };
+Chart.defaults.hover = { mode: 'nearest', intersect: false };
+Chart.defaults.onHover = function(evt, elements, chart) {
+  chart.canvas.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+};
 
 // Custom tooltip style
 const tooltipStyle = {
@@ -462,6 +471,7 @@ const tooltipStyle = {
   padding: 10,
   cornerRadius: 8,
   displayColors: false,
+  animation: { duration: 150 },
 };
 
 // Helper: click chart element to filter table
@@ -500,9 +510,11 @@ new Chart(document.getElementById('catChart'), {
   },
   options: {
     cutout: '55%',
+    interaction: { mode: 'nearest', intersect: true },
     plugins: {
       legend: { display: true, position: 'right', labels: { boxWidth: 10, font: { size: 9 }, padding: 6, usePointStyle: true, pointStyle: 'circle' } },
       tooltip: {
+        enabled: true,
         ...tooltipStyle,
         callbacks: {
           label: function(ctx) {
@@ -530,9 +542,11 @@ new Chart(document.getElementById('originChart'), {
   },
   options: {
     indexAxis: 'y',
+    interaction: { mode: 'index', axis: 'y', intersect: false },
     plugins: {
       legend: { display: false },
       tooltip: {
+        enabled: true,
         ...tooltipStyle,
         callbacks: {
           title: function(ctx) { return ctx[0].label + ' (' + ctx[0].parsed.x + ' spinouts)'; },
@@ -550,7 +564,6 @@ new Chart(document.getElementById('originChart'), {
     },
     onClick: chartClick(function(el) {
       const label = ["Cambridge", "Oxford", "Glasgow", "Edinburgh", "Bristol", "UCL", "Southampton", "Sheffield", "Heriot-Watt Uni", "Manchester", "Sussex", "Mercedes-Benz R&D"][el.index];
-      // Map short label back to full origin name
       const fullOrigins = ["AB Elektronik (now Sensata)", "ColdQuanta (US parent)", "Compound Semiconductor Tech. (acq.)", "Durham University", "Heriot-Watt University", "Honeywell + Cambridge Quantum", "Hypres Inc. (US parent)", "Lancaster University", "M Squared Lasers", "Mercedes-Benz R&D", "MoD / DSTL", "NPL", "Newcastle University", "Oxford / Cambridge", "Oxford / Munster", "Royal Holloway, Univ. of London", "UCL", "UCL / Bristol", "UCL / Oxford", "Univ. of Manchester (IP)", "Univ. of the West of Scotland", "University of Bath", "University of Birmingham", "University of Bristol", "University of Cambridge", "University of Edinburgh", "University of Glasgow", "University of Leeds", "University of Leicester", "University of Manchester", "University of Nottingham", "University of Oxford", "University of Sheffield", "University of Southampton", "University of Strathclyde", "University of Sussex", "University of Warwick", "University of York"];
       const match = fullOrigins.find(o => o.includes(label.replace('Uni', 'University').replace(' / ', '/')));
       if (match) originFilter.value = match;
@@ -572,9 +585,11 @@ new Chart(document.getElementById('clusterChart'), {
     })
   },
   options: {
+    interaction: { mode: 'nearest', intersect: false },
     plugins: {
       legend: { display: false },
       tooltip: {
+        enabled: true,
         ...tooltipStyle,
         callbacks: {
           title: function(ctx) { return ctx[0].dataset.label; },
@@ -601,9 +616,11 @@ new Chart(document.getElementById('fundChart'), {
   },
   options: {
     indexAxis: 'y',
+    interaction: { mode: 'index', axis: 'y', intersect: false },
     plugins: {
       legend: { display: false },
       tooltip: {
+        enabled: true,
         ...tooltipStyle,
         callbacks: {
           title: function(ctx) { return ctx[0].label; },
@@ -629,9 +646,11 @@ new Chart(document.getElementById('cityChart'), {
     datasets: [{ data: [37, 35, 20, 14, 13, 13, 8, 7, 6, 4, 3, 3], backgroundColor: '#2D5A8C', borderRadius: 4, barPercentage: 0.65, hoverBackgroundColor: '#1E3A5F' }]
   },
   options: {
+    interaction: { mode: 'index', intersect: false },
     plugins: {
       legend: { display: false },
       tooltip: {
+        enabled: true,
         ...tooltipStyle,
         callbacks: {
           label: function(ctx) { return ctx.parsed.y + ' companies'; }
@@ -652,9 +671,9 @@ new Chart(document.getElementById('cityChart'), {
 new Chart(document.getElementById('yearChart'), {
   type: 'line',
   data: {
-    labels: ["<2000", "2000-04", "2005-09", "2010-14", "2015-19", "2020-24", "2025+"],
+    labels: ["<2000", "2000-04", "2005-09", "2010-14", "2015-19", "2020-24"],
     datasets: [{
-      data: [11, 7, 17, 18, 53, 60, 13],
+      data: [11, 7, 17, 18, 53, 60],
       fill: true,
       backgroundColor: 'rgba(74, 122, 181, 0.15)',
       borderColor: '#4A7AB5',
@@ -666,9 +685,11 @@ new Chart(document.getElementById('yearChart'), {
     }]
   },
   options: {
+    interaction: { mode: 'index', intersect: false },
     plugins: {
       legend: { display: false },
       tooltip: {
+        enabled: true,
         ...tooltipStyle,
         callbacks: {
           label: function(ctx) { return ctx.parsed.y + ' companies founded'; }

@@ -89,6 +89,30 @@ tr:hover td { background: #F8FAFC; }
 .footer-toggle:hover { color: #64748B; }
 .footer-sources { display: block; font-size: 0.82rem; color: #94A3B8; max-width: 750px; margin: 0.75rem auto 0; line-height: 1.7; }
 
+/* Strategic Summary */
+.strategic { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); gap: 1.25rem; margin-bottom: 1.5rem; }
+.strategic-panel { background: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; }
+.strategic-panel h2 { font-size: 0.92rem; font-weight: 600; color: #1E293B; letter-spacing: -0.01em; margin-bottom: 1rem; }
+.global-bar { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem; }
+.global-bar .bar-label { font-size: 0.78rem; color: #64748B; width: 90px; text-align: right; flex-shrink: 0; }
+.global-bar .bar-track { flex: 1; height: 22px; background: #F1F5F9; border-radius: 4px; overflow: hidden; position: relative; }
+.global-bar .bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 6px; }
+.global-bar .bar-val { font-size: 0.72rem; font-weight: 600; color: #FFFFFF; white-space: nowrap; }
+.global-bar.uk .bar-fill { background: #0D9488; }
+.global-bar:not(.uk) .bar-fill { background: #CBD5E1; }
+.global-bar:not(.uk) .bar-val { color: #64748B; }
+.value-chain { display: grid; grid-template-columns: 1fr auto; gap: 0.25rem 0.75rem; align-items: center; }
+.vc-item { font-size: 0.82rem; color: #334155; padding: 0.35rem 0; border-bottom: 1px solid #F1F5F9; }
+.vc-tag { font-size: 0.72rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 100px; text-align: center; white-space: nowrap; }
+.vc-strong { background: #CCFBF1; color: #134E48; }
+.vc-moderate { background: #FEF3C7; color: #92400E; }
+.vc-gap { background: #FEE2E2; color: #991B1B; }
+.acq-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0; border-bottom: 1px solid #F1F5F9; font-size: 0.82rem; }
+.acq-item:last-child { border-bottom: none; }
+.acq-name { font-weight: 500; color: #0F172A; }
+.acq-buyer { color: #64748B; margin-left: auto; white-space: nowrap; }
+.acq-year { font-size: 0.72rem; color: #94A3B8; }
+
 /* Download button */
 .dl-btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.7rem; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 0.78rem; font-family: inherit; font-weight: 500; color: #475569; background: #FFFFFF; cursor: pointer; transition: all 0.15s; text-decoration: none; white-space: nowrap; }
 .dl-btn:hover { background: #F8FAFC; border-color: #CBD5E1; color: #1E293B; }
@@ -104,6 +128,7 @@ tr:hover td { background: #F8FAFC; }
   .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .stat:first-child .num { font-size: 1.6rem; }
   .charts { grid-template-columns: minmax(0, 1fr); }
+  .strategic { grid-template-columns: minmax(0, 1fr); }
   .chart-wrap canvas { height: 280px !important; }
   .header h1 { font-size: 1.5rem; }
   .desc-cell { min-width: 120px; -webkit-line-clamp: 1; }
@@ -164,6 +189,46 @@ tr:hover td { background: #F8FAFC; }
   </div>
 </div>
 
+<div class="strategic">
+  <div class="strategic-panel">
+    <h2>UK Global Position &mdash; Semiconductor Revenue Share</h2>
+    <div class="global-bar"><span class="bar-label">US</span><div class="bar-track"><div class="bar-fill" style="width:48%"><span class="bar-val">48%</span></div></div></div>
+    <div class="global-bar"><span class="bar-label">Taiwan</span><div class="bar-track"><div class="bar-fill" style="width:19%"><span class="bar-val">19%</span></div></div></div>
+    <div class="global-bar"><span class="bar-label">South Korea</span><div class="bar-track"><div class="bar-fill" style="width:14%"><span class="bar-val">14%</span></div></div></div>
+    <div class="global-bar"><span class="bar-label">EU</span><div class="bar-track"><div class="bar-fill" style="width:9%"><span class="bar-val">9%</span></div></div></div>
+    <div class="global-bar"><span class="bar-label">China</span><div class="bar-track"><div class="bar-fill" style="width:7%"><span class="bar-val">7%</span></div></div></div>
+    <div class="global-bar uk"><span class="bar-label">UK</span><div class="bar-track"><div class="bar-fill" style="width:3%"><span class="bar-val">&lt;1%</span></div></div></div>
+    <p style="font-size:0.75rem;color:#94A3B8;margin-top:0.75rem;line-height:1.4;">Source: SIA 2025. UK strength is in chip design &amp; IP (ARM), compound semiconductors, and quantum &mdash; not volume manufacturing.</p>
+  </div>
+
+  <div class="strategic-panel">
+    <h2>Value Chain Coverage</h2>
+    <div class="value-chain">
+      <span class="vc-item">Chip Design &amp; IP</span><span class="vc-tag vc-strong">Strong</span>
+      <span class="vc-item">Compound Semiconductors</span><span class="vc-tag vc-strong">Strong</span>
+      <span class="vc-item">Quantum Technologies</span><span class="vc-tag vc-strong">Strong</span>
+      <span class="vc-item">Photonics &amp; Optics</span><span class="vc-tag vc-strong">Strong</span>
+      <span class="vc-item">EDA &amp; Design Tools</span><span class="vc-tag vc-moderate">Moderate</span>
+      <span class="vc-item">Sensors &amp; MEMS</span><span class="vc-tag vc-moderate">Moderate</span>
+      <span class="vc-item">Advanced Packaging</span><span class="vc-tag vc-gap">Gap</span>
+      <span class="vc-item">Leading-Edge Fab (&lt;7nm)</span><span class="vc-tag vc-gap">Gap</span>
+      <span class="vc-item">Semiconductor Equipment</span><span class="vc-tag vc-gap">Gap</span>
+    </div>
+    <p style="font-size:0.75rem;color:#94A3B8;margin-top:0.75rem;line-height:1.4;">UK has no leading-edge fabrication. Strength concentrated in design, IP licensing, and specialist materials.</p>
+  </div>
+
+  <div class="strategic-panel">
+    <h2>Notable UK Semiconductor Acquisitions</h2>
+    <div class="acq-item"><span class="acq-name">ARM Holdings</span><span class="acq-year">2016</span><span class="acq-buyer">&#127471;&#127477; SoftBank &pound;24B</span></div>
+    <div class="acq-item"><span class="acq-name">Imagination Technologies</span><span class="acq-year">2017</span><span class="acq-buyer">&#127464;&#127475; Canyon Bridge &pound;550M</span></div>
+    <div class="acq-item"><span class="acq-name">Dialog Semiconductor</span><span class="acq-year">2021</span><span class="acq-buyer">&#127471;&#127477; Renesas &pound;4.9B</span></div>
+    <div class="acq-item"><span class="acq-name">Newport Wafer Fab</span><span class="acq-year">2021</span><span class="acq-buyer">&#127464;&#127475; Nexperia &pound;63M</span></div>
+    <div class="acq-item"><span class="acq-name">Sivers Photonics</span><span class="acq-year">2021</span><span class="acq-buyer">&#127480;&#127466; Sivers Semiconductors</span></div>
+    <div class="acq-item"><span class="acq-name">XMOS</span><span class="acq-year">2024</span><span class="acq-buyer">&#127471;&#127477; Infineon</span></div>
+    <p style="font-size:0.75rem;color:#94A3B8;margin-top:0.75rem;line-height:1.4;">Foreign acquisition of UK semiconductor assets remains a strategic concern. The National Security and Investment Act 2021 now screens such deals.</p>
+  </div>
+</div>
+
 <div class="charts">
   <div class="chart-wrap">
     <h2>Companies by Category</h2>
@@ -180,14 +245,6 @@ tr:hover td { background: #F8FAFC; }
   <div class="chart-wrap">
     <h2>Top 10 by Funding (&pound;M)</h2>
     <div><canvas id="fundChart"></canvas></div>
-  </div>
-  <div class="chart-wrap">
-    <h2>Top 12 Cities</h2>
-    <div><canvas id="cityChart"></canvas></div>
-  </div>
-  <div class="chart-wrap">
-    <h2>Founded Year</h2>
-    <div><canvas id="yearChart"></canvas></div>
   </div>
 </div>
 
@@ -627,67 +684,6 @@ new Chart(document.getElementById('fundChart'), {
   }
 });
 
-// 5. VERTICAL BAR — Top 12 Cities
-new Chart(document.getElementById('cityChart'), {
-  type: 'bar',
-  data: {
-    labels: ["London", "Cambridge", "Oxford", "Edinburgh", "Bristol", "Glasgow", "Southampton", "Manchester", "Sheffield", "Cardiff", "Leeds", "Guildford"],
-    datasets: [{ data: [37, 35, 20, 14, 13, 13, 8, 7, 6, 4, 3, 3], backgroundColor: '#2D5A8C', borderRadius: 4, barPercentage: 0.65, hoverBackgroundColor: '#1E3A5F' }]
-  },
-  options: {
-    interaction: { mode: 'index', intersect: false },
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        enabled: true,
-        ...tooltipStyle,
-        callbacks: {
-          label: function(ctx) { return ctx.parsed.y + ' companies'; }
-        }
-      }
-    },
-    scales: {
-      y: { grid: { color: '#F1F5F9' }, ticks: { stepSize: 5 } },
-      x: { grid: { display: false }, ticks: { font: { size: 9 } } }
-    },
-  }
-});
-
-// 6. AREA — Founded Year Distribution
-new Chart(document.getElementById('yearChart'), {
-  type: 'line',
-  data: {
-    labels: ["<2000", "2000-04", "2005-09", "2010-14", "2015-19", "2020-24"],
-    datasets: [{
-      data: [11, 7, 17, 18, 53, 60],
-      fill: true,
-      backgroundColor: 'rgba(74, 122, 181, 0.15)',
-      borderColor: '#4A7AB5',
-      borderWidth: 2,
-      pointBackgroundColor: '#1E3A5F',
-      pointRadius: 4,
-      pointHoverRadius: 6,
-      tension: 0.3
-    }]
-  },
-  options: {
-    interaction: { mode: 'index', intersect: false },
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        enabled: true,
-        ...tooltipStyle,
-        callbacks: {
-          label: function(ctx) { return ctx.parsed.y + ' companies founded'; }
-        }
-      }
-    },
-    scales: {
-      y: { grid: { color: '#F1F5F9' }, beginAtZero: true, ticks: { stepSize: 10 } },
-      x: { grid: { display: false } }
-    }
-  }
-});
 
 applyFilters();
 </script>

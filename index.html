@@ -83,14 +83,7 @@ tr:hover td { background: #F8FAFC; }
 .dot-other { background: #94A3B8; }
 .status-text { font-size: 0.72rem; color: #64748B; }
 
-/* Row hover tooltip */
-tr { position: relative; }
-.row-tip { display: none; position: absolute; left: 0; bottom: 100%; z-index: 20; background: #0F172A; color: #CBD5E1; padding: 0.75rem 1rem; border-radius: 10px; font-size: 0.75rem; line-height: 1.55; width: max-content; max-width: 480px; box-shadow: 0 8px 24px rgba(0,0,0,0.18); pointer-events: none; }
-.row-tip .tip-name { color: #FFFFFF; font-weight: 600; font-size: 0.8rem; margin-bottom: 0.3rem; }
-.row-tip .tip-row { display: flex; gap: 0.35rem; }
-.row-tip .tip-label { color: #94A3B8; min-width: 65px; flex-shrink: 0; }
-.row-tip .tip-val { color: #E2E8F0; }
-tr:hover .row-tip { display: block; }
+
 
 .footer { padding: 2rem; text-align: center; }
 .footer-toggle { font-size: 0.75rem; color: #94A3B8; cursor: pointer; border: none; background: none; font-family: inherit; }
@@ -340,46 +333,13 @@ function renderTable() {
     // Company + hover tooltip
     const td0 = document.createElement('td');
     td0.className = 'company-name';
-    td0.style.position = 'relative';
+
     if (c.website) {
       const a = document.createElement('a');
       a.href = c.website; a.target = '_blank'; a.textContent = c.name;
       td0.appendChild(a);
     } else { td0.textContent = c.name; }
 
-    // Build hover tooltip
-    const tip = document.createElement('div');
-    tip.className = 'row-tip';
-    const tipName = document.createElement('div');
-    tipName.className = 'tip-name';
-    tipName.textContent = c.name;
-    tip.appendChild(tipName);
-    const tipFields = [
-      ['Desc', c.description],
-      ['Category', c.category],
-      ['Origin', c.origin],
-      ['City', c.city],
-      ['Stage', stageLabel(c.stage)],
-      ['Raised', c.raised],
-      ['Founded', c.founded],
-      ['Employees', c.employees],
-      ['Status', c.status],
-    ];
-    tipFields.forEach(function(f) {
-      if (!f[1]) return;
-      const row = document.createElement('div');
-      row.className = 'tip-row';
-      const lbl = document.createElement('span');
-      lbl.className = 'tip-label';
-      lbl.textContent = f[0];
-      const val = document.createElement('span');
-      val.className = 'tip-val';
-      val.textContent = f[1];
-      row.appendChild(lbl);
-      row.appendChild(val);
-      tip.appendChild(row);
-    });
-    td0.appendChild(tip);
     tr.appendChild(td0);
 
     // City

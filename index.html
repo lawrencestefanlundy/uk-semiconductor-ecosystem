@@ -280,7 +280,7 @@ a.acq-name:hover { color: #0D9488; }
 
 <div class="chart-wrap" style="margin-bottom: 1.5rem;">
   <h2>Company Formation by Year <span style="font-weight:400;color:#94A3B8;font-size:0.8rem;">&mdash; the quantum wave and AI-chip surge, at a glance</span></h2>
-  <div style="position:relative;height:280px;"><canvas id="timelineChart"></canvas></div>
+  <div style="position:relative;height:320px;"><canvas id="timelineChart"></canvas></div>
 </div>
 
 <div class="section">
@@ -921,39 +921,45 @@ new Chart(document.getElementById('fundChart'), {
   };
   const buckets = ['Quantum', 'Photonics & Lasers', 'AI & Compute', 'Semis, Materials & Sensors'];
   const colors = { 'Quantum': '#0D9488', 'Photonics & Lasers': '#2DD4BF', 'AI & Compute': '#4A7AB5', 'Semis, Materials & Sensors': '#D97706' };
-  const minYear = 2000, maxYear = 2025;
-  const years = []; for (let y = minYear; y <= maxYear; y++) years.push(y);
-  const preCount = { 'Quantum': 0, 'Photonics & Lasers': 0, 'AI & Compute': 0, 'Semis, Materials & Sensors': 0 };
-  const series = {}; buckets.forEach(b => series[b] = new Array(years.length).fill(0));
+  // Bin definitions: wide early bins, annual from 2015 to reduce noise
+  const bins = [
+    { label: '<2000', test: y => y < 2000 },
+    { label: '2000-04', test: y => y >= 2000 && y <= 2004 },
+    { label: '2005-09', test: y => y >= 2005 && y <= 2009 },
+    { label: '2010-14', test: y => y >= 2010 && y <= 2014 },
+  ];
+  for (let y = 2015; y <= 2025; y++) bins.push({ label: String(y), test: yy => yy === y });
+  const labels = bins.map(b => b.label);
+  const series = {}; buckets.forEach(b => series[b] = new Array(bins.length).fill(0));
   DATA.forEach(d => {
     const y = parseInt(d.founded); if (!y) return;
     const b = bucketFor(d.category);
-    if (y < minYear) preCount[b]++;
-    else if (y <= maxYear) series[b][y - minYear]++;
+    const idx = bins.findIndex(bin => bin.test(y));
+    if (idx >= 0) series[b][idx]++;
   });
-  const labels = ['&lt;2000'].concat(years.map(String));
   const datasets = buckets.map(b => ({
     label: b,
-    data: [preCount[b]].concat(series[b]),
+    data: series[b],
     backgroundColor: colors[b],
-    borderRadius: 2,
+    borderRadius: 3,
     borderWidth: 0,
-    barPercentage: 0.9,
-    categoryPercentage: 0.92,
+    barPercentage: 0.85,
+    categoryPercentage: 0.9,
   }));
   new Chart(document.getElementById('timelineChart'), {
     type: 'bar',
-    data: { labels: labels.map(l => l.replace('&lt;','<')), datasets },
+    data: { labels, datasets },
     options: {
       interaction: { mode: 'index', intersect: false },
+      layout: { padding: { top: 4, right: 8, bottom: 4, left: 4 } },
       onClick: (evt, elements, chart) => {
         if (!elements.length) return;
-        const label = chart.data.labels[elements[0].index];
-        if (label === '<2000') setCrossFilter('Founded: before 2000', d => { const y = parseInt(d.founded); return y && y < 2000; });
-        else setCrossFilter('Founded: ' + label, d => String(d.founded) === label);
+        const idx = elements[0].index;
+        const bin = bins[idx];
+        setCrossFilter('Founded: ' + bin.label, d => { const y = parseInt(d.founded); return !!y && bin.test(y); });
       },
       plugins: {
-        legend: { position: 'top', align: 'end', labels: { boxWidth: 10, boxHeight: 10, usePointStyle: true, pointStyle: 'circle', font: { size: 11 }, padding: 12, color: '#334155' } },
+        legend: { position: 'top', align: 'end', labels: { boxWidth: 8, boxHeight: 8, usePointStyle: true, pointStyle: 'circle', font: { size: 11 }, padding: 14, color: '#334155' } },
         tooltip: {
           ...tooltipStyle,
           callbacks: {
@@ -964,8 +970,8 @@ new Chart(document.getElementById('fundChart'), {
         }
       },
       scales: {
-        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10 }, color: '#64748B', maxRotation: 0, autoSkip: true, autoSkipPadding: 8 } },
-        y: { stacked: true, grid: { color: '#F1F5F9', borderDash: [3,3] }, beginAtZero: true, ticks: { font: { size: 11 }, color: '#64748B', stepSize: 2 }, title: { display: true, text: 'Companies founded', font: { size: 11 }, color: '#94A3B8' } }
+        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10 }, color: '#64748B', maxRotation: 0, autoSkip: false } },
+        y: { stacked: true, grid: { color: '#F1F5F9', borderDash: [3,3] }, beginAtZero: true, ticks: { font: { size: 11 }, color: '#64748B', stepSize: 4, precision: 0 }, title: { display: true, text: 'Companies founded', font: { size: 11 }, color: '#94A3B8' } }
       }
     }
   });

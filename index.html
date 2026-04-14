@@ -39,6 +39,18 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; back
 .chart-wrap { background: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; padding: 1.5rem 1.75rem 1.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; min-width: 0; }
 .chart-wrap h2 { font-size: 0.92rem; font-weight: 600; color: #1E293B; letter-spacing: -0.01em; margin-bottom: 1rem; }
 .chart-wrap canvas { height: 340px !important; }
+.cluster-map { position: relative; height: 340px; display: flex; align-items: center; justify-content: center; }
+.cluster-map svg { height: 100%; max-width: 100%; display: block; }
+.uk-outline { fill: #F1F5F9; stroke: #CBD5E1; stroke-width: 0.8; stroke-linejoin: round; }
+.cluster-bubble { fill: #0D9488; fill-opacity: 0.72; stroke: #FFFFFF; stroke-width: 1.5; cursor: pointer; transition: fill-opacity 0.15s, stroke-width 0.15s; }
+.cluster-bubble:hover { fill-opacity: 0.95; stroke-width: 2.5; }
+.cluster-label { font-size: 8px; font-weight: 600; fill: #FFFFFF; text-anchor: middle; pointer-events: none; dominant-baseline: central; }
+.cluster-tooltip { position: absolute; background: #0F172A; color: #E2E8F0; font-size: 11px; padding: 10px 12px; border-radius: 8px; pointer-events: none; opacity: 0; transition: opacity 0.15s; box-shadow: 0 4px 12px rgba(0,0,0,0.25); max-width: 240px; line-height: 1.45; z-index: 10; }
+.cluster-tooltip.visible { opacity: 1; }
+.cluster-tooltip .t-title { font-weight: 600; color: #FFFFFF; font-size: 12px; margin-bottom: 3px; }
+.cluster-tooltip .t-top { color: #94A3B8; margin-top: 4px; }
+.cluster-legend { position: absolute; bottom: 8px; right: 8px; font-size: 10px; color: #64748B; display: flex; align-items: center; gap: 6px; }
+.cluster-legend .dot { background: #0D9488; border-radius: 50%; opacity: 0.72; }
 
 .section { background: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
 .filters { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; padding: 1.1rem 1.5rem; border-bottom: 1px solid #F1F5F9; }
@@ -247,7 +259,7 @@ a.acq-name:hover { color: #0D9488; }
   </div>
   <div class="chart-wrap">
     <h2>Geographic Clusters</h2>
-    <div><canvas id="clusterChart"></canvas></div>
+    <div id="clusterMap" class="cluster-map"></div>
   </div>
   <div class="chart-wrap">
     <h2>Top 10 by Funding (&pound;M)</h2>
@@ -335,12 +347,24 @@ DATA.forEach(d => {
   const spinouts = DATA.filter(d => d.origin && !/^(Corporate|Unknown|Other|-)?$/i.test(d.origin) && d.origin.trim() !== '').length;
   const acquired = DATA.filter(d => (d.status||'').toLowerCase().startsWith('acquired')).length;
   const raisedM = raised / 1e6;
-  const fmtRaised = raisedM >= 1000 ? '£' + (raisedM/1000).toFixed(1) + 'B' : '£' + Math.round(raisedM) + 'M';
-  const set = (id, txt) => { const n = document.getElementById(id); if (n) n.textContent = txt; };
-  set('heroCount', total);
-  set('heroRaised', fmtRaised);
-  set('heroSpinouts', spinouts);
-  set('heroAcquired', acquired);
+  const fmtRaised = (v) => v >= 1000 ? '£' + (v/1000).toFixed(1) + 'B' : '£' + Math.round(v) + 'M';
+  const easeOutCubic = t => 1 - Math.pow(1-t, 3);
+  function animate(id, target, fmt, dur){
+    const el = document.getElementById(id);
+    if (!el) return;
+    const start = performance.now();
+    function tick(now){
+      const t = Math.min(1, (now - start) / dur);
+      const v = target * easeOutCubic(t);
+      el.textContent = fmt(v);
+      if (t < 1) requestAnimationFrame(tick); else el.textContent = fmt(target);
+    }
+    requestAnimationFrame(tick);
+  }
+  animate('heroCount', total, v => Math.round(v).toString(), 900);
+  animate('heroRaised', raisedM, v => fmtRaised(v), 1200);
+  animate('heroSpinouts', spinouts, v => Math.round(v).toString(), 1000);
+  animate('heroAcquired', acquired, v => Math.round(v).toString(), 1100);
 })();
 
 function badgeClass(cat) {
@@ -663,47 +687,76 @@ new Chart(document.getElementById('originChart'), {
   }
 });
 
-// 3. HORIZONTAL BAR — Geographic Clusters
-new Chart(document.getElementById('clusterChart'), {
-  type: 'bar',
-  data: {
-    labels: clusterLabels,
-    datasets: [{
-      label: 'Companies',
-      data: clusterCounts,
-      backgroundColor: '#1E3A5F',
-      borderRadius: 4,
-      barPercentage: 0.7,
-      hoverBackgroundColor: '#0F172A'
-    }]
-  },
-  options: {
-    indexAxis: 'y',
-    interaction: { mode: 'index', axis: 'y', intersect: false },
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        enabled: true,
-        ...tooltipStyle,
-        callbacks: {
-          title: function(ctx) { return ctx[0].label; },
-          label: function(ctx) {
-            const i = ctx.dataIndex;
-            const top = clusterTopCompanies[ctx.label] || [];
-            const avg = clusterFundingM[i] > 0 ? Math.round(clusterFundingM[i] / ctx.raw * 10) / 10 : 0;
-            const lines = [ctx.raw + ' companies', '\u00A3' + clusterFundingM[i] + 'M raised (\u00A3' + avg + 'M avg)', clusterSpinouts[i] + ' university spinouts'];
-            if (top.length) lines.push('', 'Anchors: ' + top.join(', '));
-            return lines;
-          }
-        }
-      }
-    },
-    scales: {
-      x: { grid: { color: '#F1F5F9' }, ticks: { font: { size: 11 } } },
-      y: { grid: { display: false }, ticks: { font: { size: 11 } } }
-    },
-  }
-});
+// 3. UK CLUSTER MAP — Geographic Clusters (SVG proportional-bubble map)
+(function renderClusterMap(){
+  const container = document.getElementById('clusterMap');
+  if (!container) return;
+  // Cluster positions on a 280x500 UK silhouette viewBox
+  const positions = {
+    "London": {x: 225, y: 385},
+    "Cambridge": {x: 215, y: 335},
+    "Oxford": {x: 170, y: 375},
+    "Bristol & South West": {x: 125, y: 390},
+    "Scotland \u2014 East": {x: 140, y: 125},
+    "Scotland \u2014 West": {x: 100, y: 140},
+    "South Coast": {x: 195, y: 415},
+    "Yorkshire": {x: 160, y: 245},
+    "North West": {x: 125, y: 265},
+    "South Wales": {x: 110, y: 360},
+    "Midlands": {x: 155, y: 310},
+    "North East": {x: 150, y: 195}
+  };
+  const maxCount = Math.max(...clusterCounts);
+  const maxR = 26, minR = 6;
+  const ukPath = "M 118 18 Q 140 20 158 38 Q 165 62 152 82 Q 172 100 168 128 Q 178 155 195 178 Q 195 200 182 218 Q 200 240 198 265 Q 210 290 215 318 Q 225 348 240 368 Q 220 388 195 395 Q 175 408 150 418 Q 125 428 100 430 Q 112 410 128 402 Q 110 395 95 382 Q 75 370 82 348 Q 100 320 108 295 Q 108 270 92 250 Q 105 225 90 200 Q 70 175 60 150 Q 55 125 45 100 Q 65 75 85 55 Q 102 30 118 18 Z";
+  const niPath = "M 25 165 Q 48 160 55 180 Q 50 200 30 202 Q 8 195 15 175 Q 18 168 25 165 Z";
+  const svg = ['<svg viewBox="0 0 280 500" xmlns="http://www.w3.org/2000/svg">'];
+  svg.push('<path class="uk-outline" d="' + ukPath + '"/>');
+  svg.push('<path class="uk-outline" d="' + niPath + '"/>');
+  // Bubbles sorted largest-first so smaller sit on top
+  const entries = clusterLabels.map((lab, i) => ({label: lab, count: clusterCounts[i], idx: i}))
+    .filter(e => positions[e.label])
+    .sort((a,b) => b.count - a.count);
+  entries.forEach(e => {
+    const p = positions[e.label];
+    const r = minR + (maxR - minR) * Math.sqrt(e.count / maxCount);
+    svg.push('<circle class="cluster-bubble" cx="'+p.x+'" cy="'+p.y+'" r="'+r.toFixed(1)+'" data-i="'+e.idx+'"/>');
+    svg.push('<text class="cluster-label" x="'+p.x+'" y="'+p.y+'">'+e.count+'</text>');
+  });
+  svg.push('</svg>');
+  const tooltip = document.createElement('div');
+  tooltip.className = 'cluster-tooltip';
+  container.innerHTML = svg.join('');
+  container.appendChild(tooltip);
+  const legend = document.createElement('div');
+  legend.className = 'cluster-legend';
+  legend.innerHTML = '<span class="dot" style="width:6px;height:6px;"></span><span>few</span><span class="dot" style="width:14px;height:14px;"></span><span>many companies</span>';
+  container.appendChild(legend);
+  const svgEl = container.querySelector('svg');
+  svgEl.querySelectorAll('.cluster-bubble').forEach(b => {
+    b.addEventListener('mousemove', (ev) => {
+      const i = +b.dataset.i;
+      const label = clusterLabels[i];
+      const count = clusterCounts[i];
+      const fund = clusterFundingM[i];
+      const avg = fund > 0 ? Math.round(fund / count * 10) / 10 : 0;
+      const spin = clusterSpinouts[i];
+      const top = (clusterTopCompanies[label] || []).join(', ');
+      const rect = container.getBoundingClientRect();
+      tooltip.innerHTML = '<div class="t-title">'+label+'</div>' +
+        '<div>'+count+' companies</div>' +
+        '<div>\u00A3'+fund+'M raised &middot; \u00A3'+avg+'M avg</div>' +
+        '<div>'+spin+' university spinouts</div>' +
+        (top ? '<div class="t-top">Anchors: '+top+'</div>' : '');
+      const x = ev.clientX - rect.left + 12;
+      const y = ev.clientY - rect.top + 12;
+      tooltip.style.left = Math.min(x, rect.width - 220) + 'px';
+      tooltip.style.top = Math.min(y, rect.height - 100) + 'px';
+      tooltip.classList.add('visible');
+    });
+    b.addEventListener('mouseleave', () => { tooltip.classList.remove('visible'); });
+  });
+})();
 
 // 4. HORIZONTAL BAR — Top 10 Funded (hover shows category, city, founded)
 new Chart(document.getElementById('fundChart'), {

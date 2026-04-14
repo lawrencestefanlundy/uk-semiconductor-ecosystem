@@ -514,6 +514,9 @@ const clusterLabels = ["London", "Cambridge", "Oxford", "Bristol & South West", 
 const clusterCounts = [37, 35, 21, 17, 17, 13, 11, 10, 8, 7, 4, 4];
 const clusterFundingM = [714.9, 485.8, 610.4, 140.3, 47.9, 48.4, 15.4, 84.2, 26.0, 26.3, 128.4, 348.0];
 const clusterSpinouts = [13, 18, 15, 8, 9, 10, 4, 3, 3, 0, 3, 3];
+const catTopCompanies = {"Quantum":["Oxford Quantum Circuits","Riverlane","Quantum Motion"],"Photonics & Optics":["Rockley Photonics","Envisics","Optalysys"],"Sensors & Imaging":["Peratech","Cambridge Mechatronics","Living Optics"],"AI Chips & Accelerators":["OLIX","XMOS","Fractile"],"Processors & Compute":["Codasip","Vaire Computing","Sondrel"],"EDA & Design Tools":["PhysicsX","Agile Analog","BeyondMath"],"Semiconductors (General)":["9N Technologies","weeteq","eoSemi"],"RF & Wireless":["Forefront RF","Picocom","AccelerComm"],"Power Electronics":["Cambridge GaN Devices","Kubos Semiconductors","Fusion Dynamics"],"Advanced Materials":["Paragraf","SmartKem","DEScycle"],"Manufacturing & Foundry":["Pragmatic Semiconductor","FlexEnable","Space Forge"],"Equipment & Lasers":["Chromacity","Skylark Lasers","Opsydia"],"Security":["Crypto Quantique","SCI Semiconductor","Ethicronics"],"Memory & Compute":["sureCore","Quinas Technology","Blueshift Memory"],"Analog & Mixed Signal":["Trameto","Swindon Silicon Systems"]};
+const clusterTopCompanies = {"London":["OLIX","PhysicsX","Quantum Motion"],"Cambridge":["Paragraf","Riverlane","Cambridge GaN Devices"],"Oxford":["Rockley Photonics","Oxford Quantum Circuits","PQShield"],"Bristol & South West":["XMOS","Salience Labs","Picocom"],"Scotland \u2014 East":["Pyreos","Neuranics","CSignum"],"Scotland \u2014 West":["M Squared Lasers","CST Global","Vector Photonics"],"South Coast":["Envisics","AccelerComm","SPhotonix"],"Yorkshire":["Optalysys","Phlux Technology","Opteran"],"North West":["SmartKem","9N Technologies","Quinas Technology"],"South Wales":["Space Forge","Ffotoneg","SPTS Technologies"],"Midlands":["Delta g","Novocomms","Cerca Magnetics"],"North East":["Pragmatic Semiconductor","Peratech","Wootzano"]};
+const uniTotalFunding = {"Cambridge":471.4,"Oxford":323.6,"Manchester":313.3,"Bristol":118.5,"UCL":102.0,"Southampton":23.0,"Edinburgh":22.6,"Glasgow":18.2,"Sussex":11.8,"Sheffield":4.0,"Heriot-Watt Uni":2.2};
 
 // 1. DONUT — Companies by Category
 new Chart(document.getElementById('catChart'), {
@@ -542,8 +545,12 @@ new Chart(document.getElementById('catChart'), {
             const total = ctx.dataset.data.reduce((a,b) => a+b, 0);
             const pct = Math.round(count / total * 100);
             const funding = catFundingM[ctx.dataIndex];
-            return [ctx.label + ': ' + count + ' companies (' + pct + '%)', funding > 0 ? '\u00A3' + funding + 'M raised' : 'No disclosed funding'];
-          }
+            const top = catTopCompanies[ctx.label] || [];
+            const lines = [count + ' companies (' + pct + '% of UK total)', funding > 0 ? '\u00A3' + funding + 'M total raised' : 'No disclosed funding'];
+            if (top.length) lines.push('Top funded: ' + top.join(', '));
+            return lines;
+          },
+          title: function(ctx) { return ctx[0].label; }
         }
       }
     },
@@ -566,11 +573,15 @@ new Chart(document.getElementById('originChart'), {
         enabled: true,
         ...tooltipStyle,
         callbacks: {
-          title: function(ctx) { return ctx[0].label + ' (' + ctx[0].parsed.x + ' spinouts)'; },
+          title: function(ctx) { return ctx[0].label + ' \u2014 ' + ctx[0].parsed.x + ' spinouts'; },
           label: function(ctx) {
             const names = originCompanies[ctx.label] || [];
-            if (names.length <= 5) return names;
-            return names.slice(0, 5).concat(['+ ' + (names.length - 5) + ' more']);
+            const fund = uniTotalFunding[ctx.label];
+            const lines = [];
+            if (fund) lines.push('\u00A3' + fund + 'M raised across spinouts');
+            lines.push('');
+            if (names.length <= 6) return lines.concat(names);
+            return lines.concat(names.slice(0, 6)).concat(['+ ' + (names.length - 6) + ' more']);
           }
         }
       }
@@ -608,7 +619,11 @@ new Chart(document.getElementById('clusterChart'), {
           title: function(ctx) { return ctx[0].label; },
           label: function(ctx) {
             const i = ctx.dataIndex;
-            return [ctx.raw + ' companies', '\u00A3' + clusterFundingM[i] + 'M raised', clusterSpinouts[i] + ' spinouts'];
+            const top = clusterTopCompanies[ctx.label] || [];
+            const avg = clusterFundingM[i] > 0 ? Math.round(clusterFundingM[i] / ctx.raw * 10) / 10 : 0;
+            const lines = [ctx.raw + ' companies', '\u00A3' + clusterFundingM[i] + 'M raised (\u00A3' + avg + 'M avg)', clusterSpinouts[i] + ' university spinouts'];
+            if (top.length) lines.push('', 'Anchors: ' + top.join(', '));
+            return lines;
           }
         }
       }

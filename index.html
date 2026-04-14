@@ -39,16 +39,17 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; back
 .chart-wrap { background: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; padding: 1.5rem 1.75rem 1.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; min-width: 0; }
 .chart-wrap h2 { font-size: 0.92rem; font-weight: 600; color: #1E293B; letter-spacing: -0.01em; margin-bottom: 1rem; }
 .chart-wrap canvas { height: 340px !important; }
-.cluster-split { display: grid; grid-template-columns: minmax(320px, 420px) 1fr; gap: 1.75rem; align-items: start; }
+.cluster-split { display: grid; grid-template-columns: minmax(260px, 1fr) minmax(340px, 1.1fr); gap: 1.75rem; align-items: start; }
+@media (max-width: 760px) { .cluster-split { grid-template-columns: 1fr; } }
 .cluster-map { position: relative; height: 560px; display: flex; align-items: center; justify-content: center; }
 .cluster-map svg { height: 100%; max-width: 100%; display: block; }
 .cluster-list { display: flex; flex-direction: column; gap: 0.25rem; padding-top: 0.25rem; }
-.cluster-list .clh { display: grid; grid-template-columns: 1.3rem 1fr 3rem 4rem 3.2rem; gap: 0.6rem; font-size: 0.65rem; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.05em; padding: 0 0.4rem 0.35rem; border-bottom: 1px solid #E2E8F0; margin-bottom: 0.15rem; }
+.cluster-list .clh { display: grid; grid-template-columns: 1.3rem minmax(0, 1fr) 2.6rem 3.4rem 2.6rem; gap: 0.5rem; font-size: 0.65rem; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.05em; padding: 0 0.4rem 0.35rem; border-bottom: 1px solid #E2E8F0; margin-bottom: 0.15rem; }
 .cluster-list .clh span:nth-child(3), .cluster-list .clh span:nth-child(4) { text-align: right; }
-.cluster-row { display: grid; grid-template-columns: 1.3rem 1fr 3rem 4rem 3.2rem; align-items: center; gap: 0.6rem; padding: 0.45rem 0.4rem; border-radius: 5px; cursor: pointer; font-size: 0.82rem; transition: background 0.12s; }
+.cluster-row { display: grid; grid-template-columns: 1.3rem minmax(0, 1fr) 2.6rem 3.4rem 2.6rem; align-items: center; gap: 0.5rem; padding: 0.45rem 0.4rem; border-radius: 5px; cursor: pointer; font-size: 0.82rem; transition: background 0.12s; }
 .cluster-row:hover, .cluster-row.active { background: #F1F5F9; }
 .cluster-row .cr-rank { color: #94A3B8; font-size: 0.72rem; font-variant-numeric: tabular-nums; }
-.cluster-row .cr-name { color: #0F172A; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cluster-row .cr-name { color: #0F172A; font-weight: 500; white-space: normal; line-height: 1.25; }
 .cluster-row .cr-count { text-align: right; font-variant-numeric: tabular-nums; color: #334155; font-weight: 600; }
 .cluster-row .cr-raised { text-align: right; font-variant-numeric: tabular-nums; color: #0D9488; font-size: 0.76rem; font-weight: 600; }
 .cluster-row .cr-bar { height: 6px; background: #F1F5F9; border-radius: 3px; overflow: hidden; }
@@ -173,7 +174,7 @@ tr:hover td { background: #F8FAFC; }
 .gtr-top-row { display: flex; align-items: center; gap: 0.5rem; font-size: 0.78rem; cursor: pointer; padding: 0.25rem 0.35rem; border-radius: 4px; }
 .gtr-top-row:hover { background: #F1F5F9; }
 .gtr-top-row .gtr-rank { color: #94A3B8; width: 1.3rem; font-size: 0.7rem; }
-.gtr-top-row .gtr-name { flex: 1; color: #0F172A; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gtr-top-row .gtr-name { flex: 1; color: #0F172A; font-weight: 500; white-space: normal; line-height: 1.3; word-break: break-word; }
 .gtr-top-row .gtr-amt { color: #0D9488; font-weight: 600; font-variant-numeric: tabular-nums; }
 .global-bar.uk .bar-fill { background: #0D9488; }
 .global-bar:not(.uk) .bar-fill { background: #CBD5E1; }
@@ -1090,9 +1091,10 @@ new Chart(document.getElementById('fundChart'), {
         }
       }
     },
+    layout: { padding: { left: 4, right: 8 } },
     scales: {
       x: { grid: { color: '#F1F5F9' }, ticks: { callback: v => '\u00A3' + v + 'M' } },
-      y: { grid: { display: false }, ticks: { font: { size: 10 } } }
+      y: { grid: { display: false }, ticks: { font: { size: 10 }, autoSkip: false, crossAlign: 'far', padding: 4 }, afterFit: (scale) => { scale.width = Math.max(scale.width, 150); } }
     }
   }
 });

@@ -39,16 +39,25 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; back
 .chart-wrap { background: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; padding: 1.5rem 1.75rem 1.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; min-width: 0; }
 .chart-wrap h2 { font-size: 0.92rem; font-weight: 600; color: #1E293B; letter-spacing: -0.01em; margin-bottom: 1rem; }
 .chart-wrap canvas { height: 340px !important; }
-.cluster-map { position: relative; height: 340px; display: flex; align-items: center; justify-content: center; }
+.cluster-map { position: relative; height: 640px; display: flex; align-items: center; justify-content: center; }
 .cluster-map svg { height: 100%; max-width: 100%; display: block; }
 .uk-outline { fill: #F1F5F9; stroke: #CBD5E1; stroke-width: 0.8; stroke-linejoin: round; }
 .cluster-bubble { fill: #0D9488; fill-opacity: 0.72; stroke: #FFFFFF; stroke-width: 1.5; cursor: pointer; transition: fill-opacity 0.15s, stroke-width 0.15s; }
 .cluster-bubble:hover { fill-opacity: 0.95; stroke-width: 2.5; }
-.cluster-label { font-size: 8px; font-weight: 600; fill: #FFFFFF; text-anchor: middle; pointer-events: none; dominant-baseline: central; }
-.cluster-tooltip { position: absolute; background: #0F172A; color: #E2E8F0; font-size: 11px; padding: 10px 12px; border-radius: 8px; pointer-events: none; opacity: 0; transition: opacity 0.15s; box-shadow: 0 4px 12px rgba(0,0,0,0.25); max-width: 240px; line-height: 1.45; z-index: 10; }
+.cluster-label { font-size: 11px; font-weight: 700; fill: #FFFFFF; text-anchor: middle; pointer-events: none; dominant-baseline: central; }
+.cluster-tooltip { position: absolute; background: #0F172A; color: #E2E8F0; font-size: 12px; padding: 14px 16px; border-radius: 10px; pointer-events: none; opacity: 0; transition: opacity 0.15s; box-shadow: 0 8px 24px rgba(0,0,0,0.35); width: 320px; max-width: 320px; line-height: 1.5; z-index: 10; border: 1px solid #334155; }
 .cluster-tooltip.visible { opacity: 1; }
-.cluster-tooltip .t-title { font-weight: 600; color: #FFFFFF; font-size: 12px; margin-bottom: 3px; }
-.cluster-tooltip .t-top { color: #94A3B8; margin-top: 4px; }
+.cluster-tooltip .t-title { font-weight: 700; color: #FFFFFF; font-size: 15px; margin-bottom: 8px; border-bottom: 1px solid #334155; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: baseline; }
+.cluster-tooltip .t-title .t-count { font-size: 11px; font-weight: 500; color: #5EEAD4; }
+.cluster-tooltip .t-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; margin-bottom: 8px; }
+.cluster-tooltip .t-stat { display: flex; flex-direction: column; }
+.cluster-tooltip .t-stat-val { font-size: 14px; font-weight: 600; color: #FFFFFF; }
+.cluster-tooltip .t-stat-lbl { font-size: 10px; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.04em; }
+.cluster-tooltip .t-section { margin-top: 6px; padding-top: 6px; border-top: 1px solid #1E293B; }
+.cluster-tooltip .t-section-lbl { font-size: 10px; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 3px; }
+.cluster-tooltip .t-cats { color: #CBD5E1; font-size: 11px; line-height: 1.5; }
+.cluster-tooltip .t-top { color: #CBD5E1; font-size: 11px; }
+.cluster-tooltip .t-hint { font-size: 10px; color: #64748B; margin-top: 8px; font-style: italic; }
 .cluster-legend { position: absolute; bottom: 8px; right: 8px; font-size: 10px; color: #64748B; display: flex; align-items: center; gap: 6px; }
 .cluster-legend .dot { background: #0D9488; border-radius: 50%; opacity: 0.72; }
 
@@ -296,8 +305,8 @@ a.acq-name:hover { color: #0D9488; }
     <h2>University &amp; Research Spinouts</h2>
     <div><canvas id="originChart"></canvas></div>
   </div>
-  <div class="chart-wrap">
-    <h2>Geographic Clusters</h2>
+  <div class="chart-wrap" style="grid-column: 1 / -1;">
+    <h2>Geographic Clusters <span style="font-weight:400;color:#94A3B8;font-size:0.8rem;">&mdash; hover for cluster detail, click to filter</span></h2>
     <div id="clusterMap" class="cluster-map"></div>
   </div>
   <div class="chart-wrap">
@@ -826,7 +835,26 @@ const UK_MAP_POSITIONS = {"London":{"x":220.2,"y":438.8},"Cambridge":{"x":226.4,
   if (!container) return;
   const positions = UK_MAP_POSITIONS;
   const maxCount = Math.max(...clusterCounts);
-  const maxR = 24, minR = 6;
+  const maxR = 30, minR = 8;
+
+  // Per-cluster stats computed lazily (clusterCityMap is declared later in file)
+  const clusterStats = {};
+  function getStats(label) {
+    if (clusterStats[label]) return clusterStats[label];
+    const cities = new Set((clusterCityMap[label] || []).map(c => c.toLowerCase()));
+    const rows = DATA.filter(d => cities.has((d.city||'').toLowerCase()));
+    const catCount = {};
+    rows.forEach(r => { catCount[r.category] = (catCount[r.category]||0) + 1; });
+    const topCats = Object.entries(catCount).sort((a,b)=>b[1]-a[1]).slice(0,3);
+    const acquired = rows.filter(r => (r.status||'').toLowerCase().startsWith('acquired')).length;
+    const active = rows.filter(r => (r.status||'').toLowerCase() === 'active').length;
+    const spinouts = rows.filter(r => r.origin && r.origin.trim() !== '').length;
+    const funded = rows.filter(r => (r.raisedNum||0) > 0).length;
+    const totalM = Math.round(rows.reduce((s,r) => s + (r.raisedNum||0), 0) / 1e6);
+    const largest = rows.slice().sort((a,b) => (b.raisedNum||0) - (a.raisedNum||0))[0];
+    clusterStats[label] = { rows, topCats, acquired, active, spinouts, funded, totalM, largest };
+    return clusterStats[label];
+  }
   const svg = ['<svg viewBox="0 0 280 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">'];
   svg.push('<path class="uk-outline" d="' + UK_MAP_PATH + '"/>');
   // Bubbles sorted largest-first so smaller sit on top
@@ -854,20 +882,31 @@ const UK_MAP_POSITIONS = {"London":{"x":220.2,"y":438.8},"Cambridge":{"x":226.4,
       const i = +b.dataset.i;
       const label = clusterLabels[i];
       const count = clusterCounts[i];
-      const fund = clusterFundingM[i];
-      const avg = fund > 0 ? Math.round(fund / count * 10) / 10 : 0;
-      const spin = clusterSpinouts[i];
-      const top = (clusterTopCompanies[label] || []).join(', ');
+      const s = getStats(label);
+      const avgRaise = s.funded > 0 ? (s.totalM / s.funded).toFixed(1) : '0';
+      const spinPct = count > 0 ? Math.round(s.spinouts / count * 100) : 0;
+      const top = (clusterTopCompanies[label] || []).slice(0,3).join(' &middot; ');
+      const catsList = s.topCats.map(([c,n]) => '<div style="display:flex;justify-content:space-between;"><span>'+c+'</span><span style="color:#5EEAD4;">'+n+'</span></div>').join('');
+      const largestLine = s.largest && s.largest.raisedNum > 0
+        ? s.largest.name + ' (\u00A3' + Math.round(s.largest.raisedNum / 1e6) + 'M)'
+        : '&mdash;';
       const rect = container.getBoundingClientRect();
-      tooltip.innerHTML = '<div class="t-title">'+label+'</div>' +
-        '<div>'+count+' companies</div>' +
-        '<div>\u00A3'+fund+'M raised &middot; \u00A3'+avg+'M avg</div>' +
-        '<div>'+spin+' university spinouts</div>' +
-        (top ? '<div class="t-top">Anchors: '+top+'</div>' : '');
-      const x = ev.clientX - rect.left + 12;
-      const y = ev.clientY - rect.top + 12;
-      tooltip.style.left = Math.min(x, rect.width - 220) + 'px';
-      tooltip.style.top = Math.min(y, rect.height - 100) + 'px';
+      tooltip.innerHTML =
+        '<div class="t-title">' + label + '<span class="t-count">' + count + ' companies</span></div>' +
+        '<div class="t-stats">' +
+          '<div class="t-stat"><span class="t-stat-val">\u00A3' + s.totalM + 'M</span><span class="t-stat-lbl">Total raised</span></div>' +
+          '<div class="t-stat"><span class="t-stat-val">\u00A3' + avgRaise + 'M</span><span class="t-stat-lbl">Avg per funded</span></div>' +
+          '<div class="t-stat"><span class="t-stat-val">' + s.spinouts + ' (' + spinPct + '%)</span><span class="t-stat-lbl">Spinouts</span></div>' +
+          '<div class="t-stat"><span class="t-stat-val">' + s.acquired + '</span><span class="t-stat-lbl">Acquired</span></div>' +
+        '</div>' +
+        '<div class="t-section"><div class="t-section-lbl">Top sectors</div><div class="t-cats">' + catsList + '</div></div>' +
+        '<div class="t-section"><div class="t-section-lbl">Largest raise</div><div class="t-top">' + largestLine + '</div></div>' +
+        (top ? '<div class="t-section"><div class="t-section-lbl">Anchor companies</div><div class="t-top">' + top + '</div></div>' : '') +
+        '<div class="t-hint">Click to filter table by this cluster</div>';
+      const x = ev.clientX - rect.left + 14;
+      const y = ev.clientY - rect.top + 14;
+      tooltip.style.left = Math.min(x, rect.width - 340) + 'px';
+      tooltip.style.top = Math.min(Math.max(y, 0), rect.height - 280) + 'px';
       tooltip.classList.add('visible');
     });
     b.addEventListener('mouseleave', () => { tooltip.classList.remove('visible'); });

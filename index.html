@@ -110,6 +110,15 @@ tr:hover td { background: #F8FAFC; }
 
 /* Strategic Summary */
 .strategic { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); gap: 1.25rem; margin-top: 2rem; margin-bottom: 1.5rem; }
+.funding-panel { grid-column: 1 / -1; }
+.funding-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.75rem; margin-top: 0.75rem; }
+.fund-item { display: flex; flex-direction: column; padding: 0.75rem 0.9rem; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; gap: 0.15rem; transition: border-color 0.15s; }
+.fund-item:hover { border-color: #5EEAD4; background: #F0FDFA; }
+.fund-name { font-weight: 600; font-size: 0.85rem; color: #0F2942; text-decoration: none; }
+.fund-name:hover { color: #0D9488; }
+.fund-amt { font-size: 0.78rem; font-weight: 600; color: #0D9488; letter-spacing: 0.02em; }
+.fund-note { font-size: 0.72rem; color: #64748B; line-height: 1.35; }
+.callout-sub { margin-top: 1rem; padding: 0.75rem 1rem; background: #FEF3C7; border-left: 3px solid #D97706; border-radius: 4px; font-size: 0.78rem; color: #78350F; line-height: 1.5; }
 .strategic-panel { background: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; }
 .strategic-panel h2 { font-size: 0.78rem; font-weight: 600; color: #94A3B8; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.5rem; }
 .takeaway { font-size: 1.05rem; font-weight: 600; color: #0F172A; line-height: 1.35; margin-bottom: 1.1rem; letter-spacing: -0.01em; }
@@ -246,15 +255,35 @@ a.acq-name:hover { color: #0D9488; }
   <div class="strategic-panel">
     <h2>Notable UK Semiconductor Acquisitions</h2>
     <p class="takeaway">UK has lost most of its <span class="accent-bad">flagship semiconductor companies</span> to foreign buyers since 2016.</p>
-    <div class="acq-item"><a class="acq-name" href="https://www.arm.com" target="_blank">ARM Holdings</a><span class="acq-year">2016</span><span class="acq-buyer">&#127471;&#127477; SoftBank &pound;24B</span></div>
-    <div class="acq-item"><a class="acq-name" href="https://www.imaginationtech.com" target="_blank">Imagination Technologies</a><span class="acq-year">2017</span><span class="acq-buyer">&#127464;&#127475; Canyon Bridge &pound;550M</span></div>
+    <div class="acq-item"><a class="acq-name" href="https://www.ionq.com" target="_blank">Oxford Ionics</a><span class="acq-year">2025</span><span class="acq-buyer">&#127482;&#127480; IonQ</span></div>
+    <div class="acq-item"><a class="acq-name" href="https://www.infineon.com" target="_blank">XMOS</a><span class="acq-year">2024</span><span class="acq-buyer">&#127465;&#127466; Infineon</span></div>
+    <div class="acq-item"><a class="acq-name" href="https://news.microsoft.com/source/2022/12/09/microsoft-acquires-lumenisity-an-innovator-in-hollow-core-fiber-hcf-cable/" target="_blank">Lumenisity</a><span class="acq-year">2022</span><span class="acq-buyer">&#127482;&#127480; Microsoft</span></div>
     <div class="acq-item"><a class="acq-name" href="https://www.renesas.com" target="_blank">Dialog Semiconductor</a><span class="acq-year">2021</span><span class="acq-buyer">&#127471;&#127477; Renesas &pound;4.9B</span></div>
     <div class="acq-item"><a class="acq-name" href="https://www.nexperia.com" target="_blank">Newport Wafer Fab</a><span class="acq-year">2021</span><span class="acq-buyer">&#127464;&#127475; Nexperia &pound;63M</span></div>
     <div class="acq-item"><a class="acq-name" href="https://www.sivers-semiconductors.com" target="_blank">Sivers Photonics</a><span class="acq-year">2021</span><span class="acq-buyer">&#127480;&#127466; Sivers Semiconductors</span></div>
-    <div class="acq-item"><a class="acq-name" href="https://www.ionq.com" target="_blank">Oxford Ionics</a><span class="acq-year">2025</span><span class="acq-buyer">&#127482;&#127480; IonQ</span></div>
-    <div class="acq-item"><a class="acq-name" href="https://news.microsoft.com/source/2022/12/09/microsoft-acquires-lumenisity-an-innovator-in-hollow-core-fiber-hcf-cable/" target="_blank">Lumenisity</a><span class="acq-year">2022</span><span class="acq-buyer">&#127482;&#127480; Microsoft</span></div>
-    <div class="acq-item"><a class="acq-name" href="https://www.infineon.com" target="_blank">XMOS</a><span class="acq-year">2024</span><span class="acq-buyer">&#127465;&#127466; Infineon</span></div>
+    <div class="acq-item"><a class="acq-name" href="https://www.imaginationtech.com" target="_blank">Imagination Technologies</a><span class="acq-year">2017</span><span class="acq-buyer">&#127464;&#127475; Canyon Bridge &pound;550M</span></div>
+    <div class="acq-item"><a class="acq-name" href="https://www.arm.com" target="_blank">ARM Holdings</a><span class="acq-year">2016</span><span class="acq-buyer">&#127471;&#127477; SoftBank &pound;24B</span></div>
     <div class="callout"><strong>~&pound;30B+ of UK semiconductor assets sold to foreign buyers since 2016.</strong> The National Security and Investment Act 2021 now screens such deals, but the pattern of acquisition continues.</div>
+  </div>
+
+  <div class="strategic-panel funding-panel">
+    <h2>UK Public Funding &amp; Grants for Semiconductors</h2>
+    <p class="takeaway">Headline commitments total <span class="accent">&pound;4.5B+</span> across semiconductors, quantum, and compute &mdash; but deployed funding per year remains a fraction of <span class="accent-bad">EU, US, and Asian</span> programmes.</p>
+    <div class="funding-grid">
+      <div class="fund-item"><a class="fund-name" href="https://www.gov.uk/government/publications/national-semiconductor-strategy" target="_blank">National Semiconductor Strategy</a><span class="fund-amt">&pound;1B / 10 yr</span><span class="fund-note">May 2023 &mdash; DSIT-led; design, compound semis, R&amp;D</span></div>
+      <div class="fund-item"><a class="fund-name" href="https://www.gov.uk/government/publications/national-quantum-strategy" target="_blank">National Quantum Strategy</a><span class="fund-amt">&pound;2.5B / 10 yr</span><span class="fund-note">Nov 2023 &mdash; includes 5 EPSRC hubs, Quantum Missions</span></div>
+      <div class="fund-item"><a class="fund-name" href="https://www.aria.org.uk" target="_blank">ARIA</a><span class="fund-amt">&pound;800M / 4 yr</span><span class="fund-note">Scalable compute, programmable matter, brain-inspired AI</span></div>
+      <div class="fund-item"><a class="fund-name" href="https://iuk.ktn-uk.org/programmes/chipstart-uk/" target="_blank">ChipStart UK</a><span class="fund-amt">&pound;1.3M per cohort</span><span class="fund-note">Innovate UK accelerator run by Silicon Catalyst UK</span></div>
+      <div class="fund-item"><a class="fund-name" href="https://csconnected.com" target="_blank">CSconnected / Strength in Places</a><span class="fund-amt">~&pound;43M</span><span class="fund-note">South Wales compound-semi cluster fund</span></div>
+      <div class="fund-item"><a class="fund-name" href="https://csa.catapult.org.uk" target="_blank">CSA Catapult</a><span class="fund-amt">Core-funded</span><span class="fund-note">Compound-semi applications centre, Newport</span></div>
+      <div class="fund-item"><a class="fund-name" href="https://ukri.org/councils/epsrc" target="_blank">EPSRC Prosperity Partnerships</a><span class="fund-amt">Per-project</span><span class="fund-note">University-industry R&amp;D co-funding, incl. semis &amp; photonics</span></div>
+      <div class="fund-item"><a class="fund-name" href="https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/programmes/horizon" target="_blank">Horizon Europe (rejoined 2024)</a><span class="fund-amt">&pound;2.4B/yr access</span><span class="fund-note">UK firms now eligible for EU Chips JU, QuantERA, photonics</span></div>
+      <div class="fund-item"><a class="fund-name" href="https://www.henryroyce.ac.uk" target="_blank">Henry Royce Institute</a><span class="fund-amt">&pound;235M (capital)</span><span class="fund-note">Advanced materials, incl. 2D, wide-bandgap, photonics</span></div>
+      <div class="fund-item"><a class="fund-name" href="https://uknqcc.ac.uk" target="_blank">National Quantum Computing Centre</a><span class="fund-amt">&pound;93M</span><span class="fund-note">Harwell-based testbed for UK quantum hardware</span></div>
+      <div class="fund-item"><a class="fund-name" href="https://www.gov.uk/government/organisations/innovate-uk" target="_blank">Innovate UK grants (SMART etc.)</a><span class="fund-amt">Project-based</span><span class="fund-note">Open competitions, ~25-70% match funding</span></div>
+      <div class="fund-item"><a class="fund-name" href="https://www.gov.uk/guidance/research-and-development-tax-relief-for-small-and-medium-sized-enterprises" target="_blank">R&amp;D Tax Credits</a><span class="fund-amt">Horizontal</span><span class="fund-note">Up to 27p per &pound;1 for loss-making R&amp;D-intensive SMEs</span></div>
+    </div>
+    <p class="callout-sub"><strong>Context:</strong> EU Chips Act &euro;43B (2023), US CHIPS Act $52B (2022), South Korea K-Chips Act &#8361;300T. UK commitments are an order of magnitude smaller and weighted toward R&amp;D rather than fab capex.</p>
   </div>
 </div>
 

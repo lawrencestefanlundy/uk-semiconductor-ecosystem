@@ -503,13 +503,15 @@ Chart.defaults.onHover = function(evt, elements, chart) {
 const tooltipStyle = {
   backgroundColor: '#0F172A',
   titleColor: '#FFFFFF',
-  bodyColor: '#CBD5E1',
-  titleFont: { weight: '600', size: 12 },
-  bodyFont: { size: 11 },
-  padding: 10,
+  bodyColor: '#E2E8F0',
+  titleFont: { weight: '600', size: 13 },
+  bodyFont: { size: 12 },
+  padding: 12,
   cornerRadius: 8,
   displayColors: false,
-  animation: { duration: 150 },
+  boxPadding: 4,
+  caretSize: 6,
+  animation: false,
 };
 
 
@@ -541,10 +543,11 @@ new Chart(document.getElementById('catChart'), {
   },
   options: {
     cutout: '58%',
-    interaction: { mode: 'nearest', intersect: false },
-    hover: { mode: 'nearest', intersect: false },
+    events: ['mousemove','mouseout','click','touchstart','touchmove'],
+    interaction: { mode: 'nearest', intersect: true },
+    hover: { mode: 'nearest', intersect: true },
     plugins: {
-      legend: { display: true, position: 'right', labels: { boxWidth: 12, font: { size: 12 }, padding: 10, usePointStyle: true, pointStyle: 'circle', color: '#334155' } },
+      legend: { display: true, position: 'right', onHover: (e, item, legend) => { const ch = legend.chart; ch.tooltip.setActiveElements([{datasetIndex:0,index:item.index}], {x:0,y:0}); ch.setActiveElements([{datasetIndex:0,index:item.index}]); ch.update('none'); }, onLeave: (e, item, legend) => { const ch = legend.chart; ch.tooltip.setActiveElements([],{x:0,y:0}); ch.setActiveElements([]); ch.update('none'); }, labels: { boxWidth: 12, font: { size: 12 }, padding: 10, usePointStyle: true, pointStyle: 'circle', color: '#334155' } },
       tooltip: {
         enabled: true,
         ...tooltipStyle,

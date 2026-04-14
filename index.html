@@ -908,6 +908,21 @@ const UK_MAP_PATH = "M153.782,434.009L151.907,435.755L145.719,437.501L143.094,43
 const UK_MAP_POSITIONS = {"London":{"x":220.2,"y":438.8},"Cambridge":{"x":226.4,"y":409.4},"Oxford":{"x":190.6,"y":428.6},"Bristol & South West":{"x":155.9,"y":441.1},"Scotland — East":{"x":140.3,"y":242.9},"Scotland — West":{"x":112.4,"y":247},"South Coast":{"x":186.7,"y":463.7},"Yorkshire":{"x":183,"y":340.3},"North West":{"x":164.9,"y":354.4},"South Wales":{"x":140.5,"y":439.9},"Midlands":{"x":173.9,"y":397.3},"North East":{"x":181.2,"y":287.7}};
 
 // 3. UK CLUSTER MAP — Geographic Clusters (SVG proportional-bubble map, real UK outline)
+const clusterCityMap = {
+  "London": ["London"],
+  "Cambridge": ["Cambridge"],
+  "Oxford": ["Oxford", "Milton Park", "Abingdon", "Begbroke"],
+  "Bristol & South West": ["Bristol", "Bath", "Swindon", "Exeter", "Plymouth"],
+  "Scotland \u2014 East": ["Edinburgh", "Dundee", "Fife", "Glenrothes", "Livingston"],
+  "Scotland \u2014 West": ["Glasgow", "Paisley", "Hamilton", "East Kilbride"],
+  "South Coast": ["Southampton", "Portsmouth", "Brighton", "Fareham", "Romsey"],
+  "Yorkshire": ["Leeds", "Sheffield", "York", "Huddersfield", "Bradford"],
+  "North West": ["Manchester", "Liverpool", "Warrington", "Blackburn"],
+  "South Wales": ["Cardiff", "Newport", "Swansea", "Llanwern"],
+  "Midlands": ["Birmingham", "Coventry", "Nottingham", "Leicester", "Milton Keynes", "Warwick"],
+  "North East": ["Newcastle", "Durham", "Sedgefield", "Stockton"]
+};
+
 (function renderClusterMap(){
   const container = document.getElementById('clusterMap');
   if (!container) return;
@@ -1037,21 +1052,6 @@ const UK_MAP_POSITIONS = {"London":{"x":220.2,"y":438.8},"Cambridge":{"x":226.4,
     });
   }
 })();
-
-const clusterCityMap = {
-  "London": ["London"],
-  "Cambridge": ["Cambridge"],
-  "Oxford": ["Oxford", "Milton Park", "Abingdon", "Begbroke"],
-  "Bristol & South West": ["Bristol", "Bath", "Swindon", "Exeter", "Plymouth"],
-  "Scotland \u2014 East": ["Edinburgh", "Dundee", "Fife", "Glenrothes", "Livingston"],
-  "Scotland \u2014 West": ["Glasgow", "Paisley", "Hamilton", "East Kilbride"],
-  "South Coast": ["Southampton", "Portsmouth", "Brighton", "Fareham", "Romsey"],
-  "Yorkshire": ["Leeds", "Sheffield", "York", "Huddersfield", "Bradford"],
-  "North West": ["Manchester", "Liverpool", "Warrington", "Blackburn"],
-  "South Wales": ["Cardiff", "Newport", "Swansea", "Llanwern"],
-  "Midlands": ["Birmingham", "Coventry", "Nottingham", "Leicester", "Milton Keynes", "Warwick"],
-  "North East": ["Newcastle", "Durham", "Sedgefield", "Stockton"]
-};
 
 // 4. HORIZONTAL BAR — Top 10 Funded (hover shows category, city, founded)
 new Chart(document.getElementById('fundChart'), {

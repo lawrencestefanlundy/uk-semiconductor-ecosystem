@@ -540,10 +540,11 @@ new Chart(document.getElementById('catChart'), {
     }]
   },
   options: {
-    cutout: '55%',
-    interaction: { mode: 'nearest', intersect: true },
+    cutout: '58%',
+    interaction: { mode: 'nearest', intersect: false },
+    hover: { mode: 'nearest', intersect: false },
     plugins: {
-      legend: { display: true, position: 'right', labels: { boxWidth: 10, font: { size: 9 }, padding: 6, usePointStyle: true, pointStyle: 'circle' } },
+      legend: { display: true, position: 'right', labels: { boxWidth: 12, font: { size: 12 }, padding: 10, usePointStyle: true, pointStyle: 'circle', color: '#334155' } },
       tooltip: {
         enabled: true,
         ...tooltipStyle,

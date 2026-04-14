@@ -144,6 +144,11 @@ a.acq-name:hover { color: #0D9488; }
 .dl-btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.7rem; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 0.78rem; font-family: inherit; font-weight: 500; color: #475569; background: #FFFFFF; cursor: pointer; transition: all 0.15s; text-decoration: none; white-space: nowrap; }
 .dl-btn:hover { background: #F8FAFC; border-color: #CBD5E1; color: #1E293B; }
 .dl-btn svg { width: 14px; height: 14px; }
+.cross-pill { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.4rem 0.35rem 0.7rem; background: #CCFBF1; color: #134E48; border: 1px solid #5EEAD4; border-radius: 100px; font-size: 0.78rem; font-weight: 500; margin-left: 0.25rem; animation: pillIn 0.2s ease-out; }
+.cross-pill button { border: none; background: rgba(15,23,42,0.1); color: #0F172A; width: 18px; height: 18px; border-radius: 50%; font-size: 0.9rem; line-height: 1; cursor: pointer; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
+.cross-pill button:hover { background: rgba(15,23,42,0.2); }
+@keyframes pillIn { from { opacity: 0; transform: scale(0.85);} to { opacity: 1; transform: scale(1);} }
+.chart-wrap canvas, .cluster-map { cursor: pointer; }
 
 @media (max-width: 1200px) {
   .origin-cell { white-space: normal; }
@@ -266,6 +271,11 @@ a.acq-name:hover { color: #0D9488; }
     <p style="font-size:0.72rem;color:#64748B;margin:-0.25rem 0 0.5rem;"><span style="color:#B91C1C;">&#9632;</span> Distressed &nbsp; <span style="color:#94A3B8;">&#9632;</span> Acquired &nbsp; <span style="color:#D97706;">&#9632;</span> Active</p>
     <div><canvas id="fundChart"></canvas></div>
   </div>
+</div>
+
+<div class="chart-wrap" style="margin-bottom: 1.5rem;">
+  <h2>Company Formation by Year <span style="font-weight:400;color:#94A3B8;font-size:0.8rem;">&mdash; the quantum wave and AI-chip surge, at a glance</span></h2>
+  <div style="position:relative;height:280px;"><canvas id="timelineChart"></canvas></div>
 </div>
 
 <div class="section">
@@ -421,6 +431,7 @@ const originFilter = document.getElementById('originFilter');
 
 let sortCol = 0, sortAsc = true;
 let filtered = [...DATA];
+let crossFilter = null; // {label, test: fn(row)=>bool}
 
 function applyFilters() {
   const q = document.getElementById('search').value.toLowerCase();
@@ -441,10 +452,31 @@ function applyFilters() {
       if (status === 'Other') { if (['Active','Public','Acquired'].includes(g)) return false; }
       else if (g !== status) return false;
     }
+    if (crossFilter && !crossFilter.test(c)) return false;
     return true;
   });
   doSort();
   renderTable();
+  renderCrossPill();
+}
+
+function renderCrossPill() {
+  const existing = document.getElementById('crossPill');
+  if (existing) existing.remove();
+  if (!crossFilter) return;
+  const pill = document.createElement('span');
+  pill.id = 'crossPill';
+  pill.className = 'cross-pill';
+  pill.innerHTML = '<span>' + crossFilter.label + '</span><button aria-label="Clear">&times;</button>';
+  pill.querySelector('button').addEventListener('click', () => { crossFilter = null; applyFilters(); });
+  const filtersBar = document.querySelector('.filters');
+  filtersBar.insertBefore(pill, filtersBar.querySelector('.result-count'));
+}
+
+function setCrossFilter(label, testFn) {
+  if (crossFilter && crossFilter.label === label) { crossFilter = null; } else { crossFilter = {label, test: testFn}; }
+  applyFilters();
+  document.querySelector('.section .filters').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 function doSort() {
@@ -628,8 +660,13 @@ new Chart(document.getElementById('catChart'), {
     events: ['mousemove','mouseout','click','touchstart','touchmove'],
     interaction: { mode: 'nearest', intersect: true },
     hover: { mode: 'nearest', intersect: true },
+    onClick: (evt, elements, chart) => {
+      if (!elements.length) return;
+      const label = chart.data.labels[elements[0].index];
+      setCrossFilter('Category: ' + label, d => d.category === label);
+    },
     plugins: {
-      legend: { display: true, position: 'right', onHover: (e, item, legend) => { const ch = legend.chart; ch.tooltip.setActiveElements([{datasetIndex:0,index:item.index}], {x:0,y:0}); ch.setActiveElements([{datasetIndex:0,index:item.index}]); ch.update('none'); }, onLeave: (e, item, legend) => { const ch = legend.chart; ch.tooltip.setActiveElements([],{x:0,y:0}); ch.setActiveElements([]); ch.update('none'); }, labels: { boxWidth: 12, font: { size: 12 }, padding: 10, usePointStyle: true, pointStyle: 'circle', color: '#334155' } },
+      legend: { display: true, position: 'right', onHover: (e, item, legend) => { const ch = legend.chart; ch.tooltip.setActiveElements([{datasetIndex:0,index:item.index}], {x:0,y:0}); ch.setActiveElements([{datasetIndex:0,index:item.index}]); ch.update('none'); }, onLeave: (e, item, legend) => { const ch = legend.chart; ch.tooltip.setActiveElements([],{x:0,y:0}); ch.setActiveElements([]); ch.update('none'); }, onClick: (e, item) => { setCrossFilter('Category: ' + item.text, d => d.category === item.text); }, labels: { boxWidth: 12, font: { size: 12 }, padding: 10, usePointStyle: true, pointStyle: 'circle', color: '#334155' } },
       tooltip: {
         enabled: true,
         ...tooltipStyle,
@@ -660,6 +697,12 @@ new Chart(document.getElementById('originChart'), {
   },
   options: {
     indexAxis: 'y',
+    onClick: (evt, elements, chart) => {
+      if (!elements.length) return;
+      const label = chart.data.labels[elements[0].index];
+      const match = label === 'UCL' ? 'UCL' : (label === 'Heriot-Watt Uni' ? 'Heriot-Watt' : label);
+      setCrossFilter('University: ' + label, d => d.origin && d.origin.toLowerCase().includes(match.toLowerCase()));
+    },
     interaction: { mode: 'index', axis: 'y', intersect: false },
     plugins: {
       legend: { display: false },
@@ -755,8 +798,29 @@ new Chart(document.getElementById('originChart'), {
       tooltip.classList.add('visible');
     });
     b.addEventListener('mouseleave', () => { tooltip.classList.remove('visible'); });
+    b.addEventListener('click', () => {
+      const i = +b.dataset.i;
+      const label = clusterLabels[i];
+      const cities = new Set((clusterCityMap[label] || []).map(c => c.toLowerCase()));
+      setCrossFilter('Cluster: ' + label, d => cities.has((d.city||'').toLowerCase()));
+    });
   });
 })();
+
+const clusterCityMap = {
+  "London": ["London"],
+  "Cambridge": ["Cambridge"],
+  "Oxford": ["Oxford", "Milton Park", "Abingdon", "Begbroke"],
+  "Bristol & South West": ["Bristol", "Bath", "Swindon", "Exeter", "Plymouth"],
+  "Scotland \u2014 East": ["Edinburgh", "Dundee", "Fife", "Glenrothes", "Livingston"],
+  "Scotland \u2014 West": ["Glasgow", "Paisley", "Hamilton", "East Kilbride"],
+  "South Coast": ["Southampton", "Portsmouth", "Brighton", "Fareham", "Romsey"],
+  "Yorkshire": ["Leeds", "Sheffield", "York", "Huddersfield", "Bradford"],
+  "North West": ["Manchester", "Liverpool", "Warrington", "Blackburn"],
+  "South Wales": ["Cardiff", "Newport", "Swansea", "Llanwern"],
+  "Midlands": ["Birmingham", "Coventry", "Nottingham", "Leicester", "Milton Keynes", "Warwick"],
+  "North East": ["Newcastle", "Durham", "Sedgefield", "Stockton"]
+};
 
 // 4. HORIZONTAL BAR — Top 10 Funded (hover shows category, city, founded)
 new Chart(document.getElementById('fundChart'), {
@@ -772,6 +836,11 @@ new Chart(document.getElementById('fundChart'), {
   },
   options: {
     indexAxis: 'y',
+    onClick: (evt, elements, chart) => {
+      if (!elements.length) return;
+      const name = chart.data.labels[elements[0].index];
+      setCrossFilter('Company: ' + name, d => d.name === name);
+    },
     interaction: { mode: 'index', axis: 'y', intersect: false },
     plugins: {
       legend: { display: false },
@@ -797,6 +866,66 @@ new Chart(document.getElementById('fundChart'), {
   }
 });
 
+
+// 5. TIMELINE — Company Formation by Year (stacked bars, 4 categories)
+(function renderTimeline(){
+  const bucketFor = (cat) => {
+    if (cat === 'Quantum') return 'Quantum';
+    if (cat === 'Photonics & Optics' || cat === 'Equipment & Lasers') return 'Photonics & Lasers';
+    if (cat === 'AI Chips & Accelerators' || cat === 'Processors & Compute' || cat === 'Memory & Compute' || cat === 'EDA & Design Tools') return 'AI & Compute';
+    return 'Semis, Materials & Sensors';
+  };
+  const buckets = ['Quantum', 'Photonics & Lasers', 'AI & Compute', 'Semis, Materials & Sensors'];
+  const colors = { 'Quantum': '#0D9488', 'Photonics & Lasers': '#2DD4BF', 'AI & Compute': '#4A7AB5', 'Semis, Materials & Sensors': '#D97706' };
+  const minYear = 2000, maxYear = 2025;
+  const years = []; for (let y = minYear; y <= maxYear; y++) years.push(y);
+  const preCount = { 'Quantum': 0, 'Photonics & Lasers': 0, 'AI & Compute': 0, 'Semis, Materials & Sensors': 0 };
+  const series = {}; buckets.forEach(b => series[b] = new Array(years.length).fill(0));
+  DATA.forEach(d => {
+    const y = parseInt(d.founded); if (!y) return;
+    const b = bucketFor(d.category);
+    if (y < minYear) preCount[b]++;
+    else if (y <= maxYear) series[b][y - minYear]++;
+  });
+  const labels = ['&lt;2000'].concat(years.map(String));
+  const datasets = buckets.map(b => ({
+    label: b,
+    data: [preCount[b]].concat(series[b]),
+    backgroundColor: colors[b],
+    borderRadius: 2,
+    borderWidth: 0,
+    barPercentage: 0.9,
+    categoryPercentage: 0.92,
+  }));
+  new Chart(document.getElementById('timelineChart'), {
+    type: 'bar',
+    data: { labels: labels.map(l => l.replace('&lt;','<')), datasets },
+    options: {
+      interaction: { mode: 'index', intersect: false },
+      onClick: (evt, elements, chart) => {
+        if (!elements.length) return;
+        const label = chart.data.labels[elements[0].index];
+        if (label === '<2000') setCrossFilter('Founded: before 2000', d => { const y = parseInt(d.founded); return y && y < 2000; });
+        else setCrossFilter('Founded: ' + label, d => String(d.founded) === label);
+      },
+      plugins: {
+        legend: { position: 'top', align: 'end', labels: { boxWidth: 10, boxHeight: 10, usePointStyle: true, pointStyle: 'circle', font: { size: 11 }, padding: 12, color: '#334155' } },
+        tooltip: {
+          ...tooltipStyle,
+          callbacks: {
+            title: (ctx) => 'Founded ' + ctx[0].label,
+            label: (ctx) => ctx.dataset.label + ': ' + ctx.parsed.y + (ctx.parsed.y === 1 ? ' company' : ' companies'),
+            footer: (ctx) => 'Total: ' + ctx.reduce((s,c) => s + c.parsed.y, 0)
+          }
+        }
+      },
+      scales: {
+        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10 }, color: '#64748B', maxRotation: 0, autoSkip: true, autoSkipPadding: 8 } },
+        y: { stacked: true, grid: { color: '#F1F5F9', borderDash: [3,3] }, beginAtZero: true, ticks: { font: { size: 11 }, color: '#64748B', stepSize: 2 }, title: { display: true, text: 'Companies founded', font: { size: 11 }, color: '#94A3B8' } }
+      }
+    }
+  });
+})();
 
 applyFilters();
 </script>

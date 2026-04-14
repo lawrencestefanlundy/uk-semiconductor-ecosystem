@@ -9,9 +9,10 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <style>
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #F8FAFC; color: #1E293B; line-height: 1.55; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: linear-gradient(180deg, #EEF2F7 0%, #F8FAFC 220px); color: #1E293B; line-height: 1.55; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 
-.header { background: #0F172A; padding: 3rem 0 2.75rem; }
+.header { background: radial-gradient(ellipse at top right, #1E3A5F 0%, #0F172A 55%, #0A0F1C 100%); padding: 3.5rem 0 3.25rem; position: relative; border-bottom: 1px solid #1E293B; }
+.header::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 3px; background: linear-gradient(90deg, #0D9488 0%, #4A7AB5 50%, #D97706 100%); }
 .header-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; }
 .header-title { display: flex; align-items: center; gap: 0.75rem; }
 .header-title .flag { font-size: 2rem; }
@@ -84,7 +85,13 @@ tr:hover td { background: #F8FAFC; }
 /* Strategic Summary */
 .strategic { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); gap: 1.25rem; margin-top: 2rem; margin-bottom: 1.5rem; }
 .strategic-panel { background: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; }
-.strategic-panel h2 { font-size: 0.92rem; font-weight: 600; color: #1E293B; letter-spacing: -0.01em; margin-bottom: 1rem; }
+.strategic-panel h2 { font-size: 0.78rem; font-weight: 600; color: #94A3B8; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.takeaway { font-size: 1.05rem; font-weight: 600; color: #0F172A; line-height: 1.35; margin-bottom: 1.1rem; letter-spacing: -0.01em; }
+.takeaway .accent { color: #0D9488; }
+.takeaway .accent-warn { color: #B45309; }
+.takeaway .accent-bad { color: #B91C1C; }
+.callout { margin-top: 0.85rem; padding: 0.7rem 0.85rem; background: #FEF3C7; border-left: 3px solid #D97706; border-radius: 4px; font-size: 0.82rem; color: #78350F; line-height: 1.45; }
+.callout strong { color: #92400E; }
 .global-bar { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem; }
 .global-bar .bar-label { font-size: 0.78rem; color: #64748B; width: 90px; text-align: right; flex-shrink: 0; }
 .global-bar .bar-track { flex: 1; height: 22px; background: #F1F5F9; border-radius: 4px; overflow: hidden; position: relative; }
@@ -94,7 +101,8 @@ tr:hover td { background: #F8FAFC; }
 .global-bar:not(.uk) .bar-fill { background: #CBD5E1; }
 .global-bar:not(.uk) .bar-val { color: #64748B; }
 .value-chain { display: grid; grid-template-columns: 1fr auto; gap: 0.25rem 0.75rem; align-items: center; }
-.vc-item { font-size: 0.82rem; color: #334155; padding: 0.35rem 0; border-bottom: 1px solid #F1F5F9; }
+.vc-item { font-size: 0.82rem; color: #334155; padding: 0.4rem 0; border-bottom: 1px solid #F1F5F9; line-height: 1.35; }
+.vc-anchors { display: block; font-size: 0.7rem; color: #94A3B8; margin-top: 0.15rem; font-weight: 400; }
 .vc-tag { font-size: 0.72rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 100px; text-align: center; white-space: nowrap; }
 .vc-strong { background: #CCFBF1; color: #134E48; }
 .vc-moderate { background: #FEF3C7; color: #92400E; }
@@ -159,7 +167,8 @@ a.acq-name:hover { color: #0D9488; }
 
 <div class="strategic">
   <div class="strategic-panel">
-    <h2>UK Global Position &mdash; Semiconductor Revenue Share</h2>
+    <h2>UK Global Position</h2>
+    <p class="takeaway">UK competes on <span class="accent">design and IP</span>, not volume &mdash; less than <span class="accent-bad">1%</span> of global semiconductor revenue.</p>
     <div class="global-bar"><span class="bar-label">US</span><div class="bar-track"><div class="bar-fill" style="width:48%"><span class="bar-val">48%</span></div></div></div>
     <div class="global-bar"><span class="bar-label">Taiwan</span><div class="bar-track"><div class="bar-fill" style="width:19%"><span class="bar-val">19%</span></div></div></div>
     <div class="global-bar"><span class="bar-label">South Korea</span><div class="bar-track"><div class="bar-fill" style="width:14%"><span class="bar-val">14%</span></div></div></div>
@@ -171,22 +180,23 @@ a.acq-name:hover { color: #0D9488; }
 
   <div class="strategic-panel">
     <h2>Value Chain Coverage</h2>
+    <p class="takeaway">Strong in <span class="accent">design</span> and <span class="accent">specialist materials</span> &mdash; structurally absent from <span class="accent-bad">fab, packaging, and equipment</span>.</p>
     <div class="value-chain">
-      <span class="vc-item">Chip Design &amp; IP</span><span class="vc-tag vc-strong">Strong</span>
-      <span class="vc-item">Compound Semiconductors</span><span class="vc-tag vc-strong">Strong</span>
-      <span class="vc-item">Quantum Technologies</span><span class="vc-tag vc-strong">Strong</span>
-      <span class="vc-item">Photonics &amp; Optics</span><span class="vc-tag vc-strong">Strong</span>
-      <span class="vc-item">EDA &amp; Design Tools</span><span class="vc-tag vc-moderate">Moderate</span>
-      <span class="vc-item">Sensors &amp; MEMS</span><span class="vc-tag vc-moderate">Moderate</span>
-      <span class="vc-item">Advanced Packaging</span><span class="vc-tag vc-gap">Gap</span>
-      <span class="vc-item">Leading-Edge Fab (&lt;7nm)</span><span class="vc-tag vc-gap">Gap</span>
-      <span class="vc-item">Semiconductor Equipment</span><span class="vc-tag vc-gap">Gap</span>
+      <span class="vc-item">Chip Design &amp; IP<span class="vc-anchors">ARM, Imagination, Graphcore, Pragmatic</span></span><span class="vc-tag vc-strong">Strong</span>
+      <span class="vc-item">Compound Semiconductors<span class="vc-anchors">IQE, Paragraf, Porotech, CST Global</span></span><span class="vc-tag vc-strong">Strong</span>
+      <span class="vc-item">Quantum Technologies<span class="vc-anchors">Riverlane, Oxford Quantum Circuits, Quantinuum</span></span><span class="vc-tag vc-strong">Strong</span>
+      <span class="vc-item">Photonics &amp; Optics<span class="vc-anchors">Rockley, Envisics, M Squared, Lumai</span></span><span class="vc-tag vc-strong">Strong</span>
+      <span class="vc-item">EDA &amp; Design Tools<span class="vc-anchors">PhysicsX, Agile Analog, Pulsic</span></span><span class="vc-tag vc-moderate">Moderate</span>
+      <span class="vc-item">Sensors &amp; MEMS<span class="vc-anchors">Sorex Sensors, Cambridge Mechatronics, Photon Force</span></span><span class="vc-tag vc-moderate">Moderate</span>
+      <span class="vc-item">Advanced Packaging<span class="vc-anchors">Limited UK presence</span></span><span class="vc-tag vc-gap">Gap</span>
+      <span class="vc-item">Leading-Edge Fab (&lt;7nm)<span class="vc-anchors">No UK presence &mdash; depends on TSMC, Samsung, Intel</span></span><span class="vc-tag vc-gap">Gap</span>
+      <span class="vc-item">Semiconductor Equipment<span class="vc-anchors">SPTS (Newport), Oxford Instruments &mdash; no ASML equivalent</span></span><span class="vc-tag vc-gap">Gap</span>
     </div>
-    <p style="font-size:0.75rem;color:#94A3B8;margin-top:0.75rem;line-height:1.4;">UK has no leading-edge fabrication. Strength concentrated in design, IP licensing, and specialist materials.</p>
   </div>
 
   <div class="strategic-panel">
     <h2>Notable UK Semiconductor Acquisitions</h2>
+    <p class="takeaway">UK has lost most of its <span class="accent-bad">flagship semiconductor companies</span> to foreign buyers since 2016.</p>
     <div class="acq-item"><a class="acq-name" href="https://www.arm.com" target="_blank">ARM Holdings</a><span class="acq-year">2016</span><span class="acq-buyer">&#127471;&#127477; SoftBank &pound;24B</span></div>
     <div class="acq-item"><a class="acq-name" href="https://www.imaginationtech.com" target="_blank">Imagination Technologies</a><span class="acq-year">2017</span><span class="acq-buyer">&#127464;&#127475; Canyon Bridge &pound;550M</span></div>
     <div class="acq-item"><a class="acq-name" href="https://www.renesas.com" target="_blank">Dialog Semiconductor</a><span class="acq-year">2021</span><span class="acq-buyer">&#127471;&#127477; Renesas &pound;4.9B</span></div>
@@ -194,7 +204,7 @@ a.acq-name:hover { color: #0D9488; }
     <div class="acq-item"><a class="acq-name" href="https://www.sivers-semiconductors.com" target="_blank">Sivers Photonics</a><span class="acq-year">2021</span><span class="acq-buyer">&#127480;&#127466; Sivers Semiconductors</span></div>
     <div class="acq-item"><a class="acq-name" href="https://www.ionq.com" target="_blank">Oxford Ionics</a><span class="acq-year">2025</span><span class="acq-buyer">&#127482;&#127480; IonQ</span></div>
     <div class="acq-item"><a class="acq-name" href="https://www.infineon.com" target="_blank">XMOS</a><span class="acq-year">2024</span><span class="acq-buyer">&#127465;&#127466; Infineon</span></div>
-    <p style="font-size:0.75rem;color:#94A3B8;margin-top:0.75rem;line-height:1.4;">Foreign acquisition of UK semiconductor assets remains a strategic concern. The National Security and Investment Act 2021 now screens such deals.</p>
+    <div class="callout"><strong>~&pound;30B+ of UK semiconductor assets sold to foreign buyers since 2016.</strong> The National Security and Investment Act 2021 now screens such deals, but the pattern of acquisition continues.</div>
   </div>
 </div>
 
@@ -213,6 +223,7 @@ a.acq-name:hover { color: #0D9488; }
   </div>
   <div class="chart-wrap">
     <h2>Top 10 by Funding (&pound;M)</h2>
+    <p style="font-size:0.72rem;color:#64748B;margin:-0.25rem 0 0.5rem;"><span style="color:#B91C1C;">&#9632;</span> Distressed &nbsp; <span style="color:#94A3B8;">&#9632;</span> Acquired &nbsp; <span style="color:#D97706;">&#9632;</span> Active</p>
     <div><canvas id="fundChart"></canvas></div>
   </div>
 </div>
@@ -614,7 +625,12 @@ new Chart(document.getElementById('fundChart'), {
   type: 'bar',
   data: {
     labels: ["Rockley Photonics", "Pragmatic Semiconductor", "OLIX", "PhysicsX", "Oxford Quantum Circuits", "Envisics", "Paragraf", "Riverlane", "XMOS", "Quantum Motion"],
-    datasets: [{ data: [420.0, 309.0, 173.0, 147.0, 125.0, 118.0, 110.0, 98.0, 75.0, 62.0], backgroundColor: '#D97706', borderRadius: 4, barPercentage: 0.7, hoverBackgroundColor: '#B45309' }]
+    datasets: [{
+      data: [420.0, 309.0, 173.0, 147.0, 125.0, 118.0, 110.0, 98.0, 75.0, 62.0],
+      backgroundColor: ['#B91C1C', '#D97706', '#D97706', '#D97706', '#D97706', '#D97706', '#D97706', '#D97706', '#94A3B8', '#D97706'],
+      borderRadius: 4,
+      barPercentage: 0.7
+    }]
   },
   options: {
     indexAxis: 'y',
@@ -628,7 +644,10 @@ new Chart(document.getElementById('fundChart'), {
           title: function(ctx) { return ctx[0].label; },
           label: function(ctx) {
             const extra = fundExtra[ctx.dataIndex];
-            return ['\u00A3' + ctx.parsed.x + 'M raised', extra.cat, extra.city + (extra.founded ? ' \u00B7 Founded ' + extra.founded : '')];
+            const statusMap = {0: 'Public \u2014 Ch.11 restructure 2023', 8: 'Acquired by Infineon (2024)'};
+            const lines = ['\u00A3' + ctx.parsed.x + 'M raised', extra.cat, extra.city + (extra.founded ? ' \u00B7 Founded ' + extra.founded : '')];
+            if (statusMap[ctx.dataIndex]) lines.push(statusMap[ctx.dataIndex]);
+            return lines;
           }
         }
       }

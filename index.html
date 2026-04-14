@@ -39,8 +39,23 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; back
 .chart-wrap { background: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; padding: 1.5rem 1.75rem 1.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; min-width: 0; }
 .chart-wrap h2 { font-size: 0.92rem; font-weight: 600; color: #1E293B; letter-spacing: -0.01em; margin-bottom: 1rem; }
 .chart-wrap canvas { height: 340px !important; }
-.cluster-map { position: relative; height: 640px; display: flex; align-items: center; justify-content: center; }
+.cluster-split { display: grid; grid-template-columns: minmax(320px, 420px) 1fr; gap: 1.75rem; align-items: start; }
+.cluster-map { position: relative; height: 560px; display: flex; align-items: center; justify-content: center; }
 .cluster-map svg { height: 100%; max-width: 100%; display: block; }
+.cluster-list { display: flex; flex-direction: column; gap: 0.25rem; padding-top: 0.25rem; }
+.cluster-list .clh { display: grid; grid-template-columns: 1.3rem 1fr 3rem 4rem 3.2rem; gap: 0.6rem; font-size: 0.65rem; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.05em; padding: 0 0.4rem 0.35rem; border-bottom: 1px solid #E2E8F0; margin-bottom: 0.15rem; }
+.cluster-list .clh span:nth-child(3), .cluster-list .clh span:nth-child(4) { text-align: right; }
+.cluster-row { display: grid; grid-template-columns: 1.3rem 1fr 3rem 4rem 3.2rem; align-items: center; gap: 0.6rem; padding: 0.45rem 0.4rem; border-radius: 5px; cursor: pointer; font-size: 0.82rem; transition: background 0.12s; }
+.cluster-row:hover, .cluster-row.active { background: #F1F5F9; }
+.cluster-row .cr-rank { color: #94A3B8; font-size: 0.72rem; font-variant-numeric: tabular-nums; }
+.cluster-row .cr-name { color: #0F172A; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cluster-row .cr-count { text-align: right; font-variant-numeric: tabular-nums; color: #334155; font-weight: 600; }
+.cluster-row .cr-raised { text-align: right; font-variant-numeric: tabular-nums; color: #0D9488; font-size: 0.76rem; font-weight: 600; }
+.cluster-row .cr-bar { height: 6px; background: #F1F5F9; border-radius: 3px; overflow: hidden; }
+.cluster-row .cr-bar-fill { height: 100%; background: #0D9488; opacity: 0.75; border-radius: 3px; }
+.cluster-row:hover .cr-bar-fill { opacity: 1; }
+.cluster-bubble.dim { fill-opacity: 0.25; }
+.cluster-bubble.hot { fill-opacity: 1; stroke-width: 2.5; stroke: #0F172A; }
 .uk-outline { fill: #F1F5F9; stroke: #CBD5E1; stroke-width: 0.8; stroke-linejoin: round; }
 .cluster-bubble { fill: #0D9488; fill-opacity: 0.72; stroke: #FFFFFF; stroke-width: 1.5; cursor: pointer; transition: fill-opacity 0.15s, stroke-width 0.15s; }
 .cluster-bubble:hover { fill-opacity: 0.95; stroke-width: 2.5; }
@@ -341,8 +356,11 @@ a.acq-name:hover { color: #0D9488; }
     <div><canvas id="originChart"></canvas></div>
   </div>
   <div class="chart-wrap" style="grid-column: 1 / -1;">
-    <h2>Geographic Clusters <span style="font-weight:400;color:#94A3B8;font-size:0.8rem;">&mdash; hover for cluster detail, click to filter</span></h2>
-    <div id="clusterMap" class="cluster-map"></div>
+    <h2>Geographic Clusters <span style="font-weight:400;color:#94A3B8;font-size:0.8rem;">&mdash; hover a bubble or row for detail, click to filter</span></h2>
+    <div class="cluster-split">
+      <div id="clusterMap" class="cluster-map"></div>
+      <div id="clusterList" class="cluster-list"></div>
+    </div>
   </div>
   <div class="chart-wrap">
     <h2>Top 10 by Funding (&pound;M)</h2>
@@ -977,6 +995,47 @@ const UK_MAP_POSITIONS = {"London":{"x":220.2,"y":438.8},"Cambridge":{"x":226.4,
       setCrossFilter('Cluster: ' + label, d => cities.has((d.city||'').toLowerCase()));
     });
   });
+
+  // Ranked cluster list in the right pane
+  const listEl = document.getElementById('clusterList');
+  if (listEl) {
+    const ranked = clusterLabels.map((lab, i) => ({ label: lab, count: clusterCounts[i], idx: i }))
+      .filter(e => e.count > 0)
+      .sort((a,b) => b.count - a.count);
+    const maxCountL = ranked[0] ? ranked[0].count : 1;
+    let html = '<div class="clh"><span>#</span><span>Cluster</span><span>Co.</span><span>Raised</span><span></span></div>';
+    ranked.forEach((e, rank) => {
+      const s = getStats(e.label);
+      const pct = Math.round(e.count / maxCountL * 100);
+      html += '<div class="cluster-row" data-i="' + e.idx + '" data-label="' + e.label.replace(/"/g,'&quot;') + '">' +
+        '<span class="cr-rank">' + (rank+1) + '</span>' +
+        '<span class="cr-name">' + e.label + '</span>' +
+        '<span class="cr-count">' + e.count + '</span>' +
+        '<span class="cr-raised">&pound;' + s.totalM + 'M</span>' +
+        '<span class="cr-bar"><span class="cr-bar-fill" style="width:' + pct + '%"></span></span>' +
+      '</div>';
+    });
+    listEl.innerHTML = html;
+    const bubblesByIdx = {};
+    svgEl.querySelectorAll('.cluster-bubble').forEach(b => { bubblesByIdx[+b.dataset.i] = b; });
+    listEl.querySelectorAll('.cluster-row').forEach(row => {
+      const i = +row.dataset.i;
+      row.addEventListener('mouseenter', (ev) => {
+        svgEl.querySelectorAll('.cluster-bubble').forEach(b => b.classList.add('dim'));
+        const b = bubblesByIdx[i];
+        if (b) { b.classList.remove('dim'); b.classList.add('hot'); b.dispatchEvent(new MouseEvent('mousemove', { clientX: row.getBoundingClientRect().left, clientY: row.getBoundingClientRect().top })); }
+      });
+      row.addEventListener('mouseleave', () => {
+        svgEl.querySelectorAll('.cluster-bubble').forEach(b => { b.classList.remove('dim'); b.classList.remove('hot'); });
+        tooltip.classList.remove('visible');
+      });
+      row.addEventListener('click', () => {
+        const label = row.dataset.label;
+        const cities = new Set((clusterCityMap[label] || []).map(c => c.toLowerCase()));
+        setCrossFilter('Cluster: ' + label, d => cities.has((d.city||'').toLowerCase()));
+      });
+    });
+  }
 })();
 
 const clusterCityMap = {

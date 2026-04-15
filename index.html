@@ -62,6 +62,12 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; back
 .cluster-bubble:hover { fill-opacity: 0.95; stroke-width: 2.5; }
 .cluster-label { font-size: 11px; font-weight: 700; fill: #FFFFFF; text-anchor: middle; pointer-events: none; dominant-baseline: central; }
 .cluster-tooltip { position: absolute; background: #0F172A; color: #E2E8F0; font-size: 12px; padding: 14px 16px; border-radius: 10px; pointer-events: none; opacity: 0; transition: opacity 0.15s; box-shadow: 0 8px 24px rgba(0,0,0,0.35); width: 320px; max-width: 320px; line-height: 1.5; z-index: 10; border: 1px solid #334155; }
+.vc-title-pop { position: fixed; background: #0F172A; color: #E2E8F0; font-size: 12px; padding: 14px 16px; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.35); width: 380px; max-width: 380px; line-height: 1.55; z-index: 1000; border: 1px solid #334155; pointer-events: none; opacity: 0; transition: opacity 0.15s; }
+.vc-title-pop.visible { opacity: 1; }
+.vc-title-pop .p-title { font-weight: 700; color: #FFFFFF; font-size: 13px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #334155; }
+.vc-title-pop .p-list { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 10px; font-size: 11px; }
+.vc-title-pop .p-list span { color: #CBD5E1; }
+.vc-title-pop .p-meta { font-size: 10px; color: #94A3B8; margin-top: 8px; padding-top: 6px; border-top: 1px solid #1E293B; }
 .cluster-tooltip.visible { opacity: 1; }
 .cluster-tooltip .t-title { font-weight: 700; color: #FFFFFF; font-size: 15px; margin-bottom: 8px; border-bottom: 1px solid #334155; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: baseline; }
 .cluster-tooltip .t-title .t-count { font-size: 11px; font-weight: 500; color: #5EEAD4; }
@@ -369,7 +375,7 @@ a.acq-name:hover { color: #0D9488; }
     <div><canvas id="fundChart"></canvas></div>
   </div>
   <div class="chart-wrap">
-    <h2>Most Active Investors <span style="font-weight:400;color:#94A3B8;font-size:0.8rem;">&mdash; publicly-announced rounds into UK semi, photonics &amp; quantum, Jan 2021&ndash;present</span></h2>
+    <h2 id="vcTitle" style="cursor: help;">Most Active Investors <span style="font-weight:400;color:#94A3B8;font-size:0.8rem;">&mdash; publicly-announced rounds into UK semi, photonics &amp; quantum, Jan 2021&ndash;present</span> <span id="vcTitleInfo" style="color:#0D9488;font-size:0.75rem;font-weight:500;border-bottom:1px dotted #0D9488;">companies covered &#9432;</span></h2>
     <p style="font-size:0.72rem;color:#64748B;margin:-0.25rem 0 0.5rem;"><span style="color:#0D9488;">&#9632;</span> UK VC &nbsp; <span style="color:#2DD4BF;">&#9632;</span> Patient / University &nbsp; <span style="color:#0F172A;">&#9632;</span> Sovereign &nbsp; <span style="color:#D97706;">&#9632;</span> Corporate &nbsp; <span style="color:#94A3B8;">&#9632;</span> Foreign</p>
     <div><canvas id="vcChart"></canvas></div>
   </div>
@@ -1132,6 +1138,30 @@ const vcColor = (v) => {
   if (v.type === 'University/Patient') return '#2DD4BF';
   return '#0D9488';
 };
+(function wireVcTitleHover(){
+  const title = document.getElementById('vcTitle');
+  if (!title) return;
+  const companies = [...new Set(VC_DATA.flatMap(v => v.top))].sort();
+  const pop = document.createElement('div');
+  pop.className = 'vc-title-pop';
+  pop.innerHTML =
+    '<div class="p-title">' + companies.length + ' UK companies referenced in this chart</div>' +
+    '<div class="p-list">' + companies.map(c => '<span>' + c + '</span>').join('') + '</div>' +
+    '<div class="p-meta">Union of notable-portfolio examples cited for each of the 18 investors (not every portfolio company appears &mdash; rounds into firms not in this list are counted but that firm may not appear here).</div>';
+  document.body.appendChild(pop);
+  title.addEventListener('mousemove', (ev) => {
+    pop.classList.add('visible');
+    const popW = 380, popH = pop.offsetHeight || 280;
+    let x = ev.clientX + 14;
+    let y = ev.clientY + 14;
+    if (x + popW > window.innerWidth - 10) x = ev.clientX - popW - 14;
+    if (y + popH > window.innerHeight - 10) y = ev.clientY - popH - 14;
+    pop.style.left = Math.max(10, x) + 'px';
+    pop.style.top = Math.max(10, y) + 'px';
+  });
+  title.addEventListener('mouseleave', () => pop.classList.remove('visible'));
+})();
+
 new Chart(document.getElementById('vcChart'), {
   type: 'bar',
   data: {

@@ -368,6 +368,11 @@ a.acq-name:hover { color: #0D9488; }
     <p style="font-size:0.72rem;color:#64748B;margin:-0.25rem 0 0.5rem;"><span style="color:#B91C1C;">&#9632;</span> Distressed &nbsp; <span style="color:#94A3B8;">&#9632;</span> Acquired &nbsp; <span style="color:#D97706;">&#9632;</span> Active</p>
     <div><canvas id="fundChart"></canvas></div>
   </div>
+  <div class="chart-wrap">
+    <h2>Most Active Investors <span style="font-weight:400;color:#94A3B8;font-size:0.8rem;">&mdash; UK semi, photonics &amp; quantum portfolio count</span></h2>
+    <p style="font-size:0.72rem;color:#64748B;margin:-0.25rem 0 0.5rem;"><span style="color:#0D9488;">&#9632;</span> UK VC &nbsp; <span style="color:#2DD4BF;">&#9632;</span> Patient / University &nbsp; <span style="color:#0F172A;">&#9632;</span> Sovereign &nbsp; <span style="color:#D97706;">&#9632;</span> Corporate &nbsp; <span style="color:#94A3B8;">&#9632;</span> Foreign</p>
+    <div><canvas id="vcChart"></canvas></div>
+  </div>
 </div>
 
 <div class="chart-wrap" style="margin-bottom: 1.5rem;">
@@ -1095,6 +1100,72 @@ new Chart(document.getElementById('fundChart'), {
     scales: {
       x: { grid: { color: '#F1F5F9' }, ticks: { callback: v => '\u00A3' + v + 'M' } },
       y: { grid: { display: false }, ticks: { font: { size: 10 }, autoSkip: false, crossAlign: 'far', padding: 4 }, afterFit: (scale) => { scale.width = Math.max(scale.width, 150); } }
+    }
+  }
+});
+
+// 4b. HORIZONTAL BAR — Most Active Investors in UK Semi / Photonics / Quantum
+const VC_DATA = [
+  {name:"Parkwalk Advisors", country:"UK", type:"VC", n:12, top:["Oxford Quantum Circuits","Quantum Motion","Nu Quantum","PQShield","Oxford Ionics"]},
+  {name:"IP Group", country:"UK", type:"VC", n:10, top:["Oxford Quantum Circuits","Oxford Ionics","Cerca Magnetics","First Light Fusion","Paragraf"]},
+  {name:"Oxford Science Enterprises", country:"UK", type:"University/Patient", n:8, top:["Oxford Quantum Circuits","Oxford Ionics","Orca Computing","Cerca Magnetics","SPhotonix"]},
+  {name:"Cambridge Innovation Capital", country:"UK", type:"University/Patient", n:8, top:["Riverlane","Nu Quantum","Paragraf","Cambridge GaN Devices","Pragmatic Semiconductor"]},
+  {name:"Amadeus Capital Partners", country:"UK", type:"VC", n:7, top:["Riverlane","PQShield","Paragraf","Salience Labs","XMOS"]},
+  {name:"IQ Capital", country:"UK", type:"VC", n:7, top:["Riverlane","PQShield","Pragmatic Semiconductor","Phasecraft","Nu Quantum"]},
+  {name:"Molten Ventures", country:"UK", type:"Growth", n:5, top:["Riverlane","Universal Quantum","PQShield","Oxford Quantum Circuits","Pragmatic Semiconductor"]},
+  {name:"Octopus Ventures", country:"UK", type:"VC", n:5, top:["Orca Computing","PhysicsX","Salience Labs","Pragmatic Semiconductor","Nu Quantum"]},
+  {name:"Foresight Group", country:"UK", type:"VC", n:4, top:["Universal Quantum","Space Forge","Porotech","Vector Photonics"]},
+  {name:"Mercia Asset Management", country:"UK", type:"VC", n:4, top:["Porotech","Sphere Fluidics","Pragmatic Semiconductor","CSignum"]},
+  {name:"Scottish Enterprise / SNIB", country:"UK", type:"Sovereign", n:4, top:["M Squared Lasers","Sivers Photonics","Space Forge","Vector Photonics"]},
+  {name:"British Patient Capital", country:"UK", type:"Sovereign", n:4, top:["Quantum Motion","Oxford Quantum Circuits","Pragmatic Semiconductor","PhysicsX"]},
+  {name:"Bosch Ventures", country:"EU", type:"Corporate", n:3, top:["Paragraf","PhysicsX","Pragmatic Semiconductor"]},
+  {name:"Sequoia Capital", country:"US", type:"VC", n:3, top:["Graphcore","PhysicsX","PQShield"]},
+  {name:"Lightspeed Venture Partners", country:"US", type:"VC", n:3, top:["Oxford Ionics","PhysicsX","Lumai"]}
+];
+const vcColor = (v) => {
+  if (v.country !== 'UK') return '#94A3B8';
+  if (v.type === 'Corporate') return '#D97706';
+  if (v.type === 'Sovereign') return '#0F172A';
+  if (v.type === 'University/Patient') return '#2DD4BF';
+  return '#0D9488';
+};
+new Chart(document.getElementById('vcChart'), {
+  type: 'bar',
+  data: {
+    labels: VC_DATA.map(v => v.name),
+    datasets: [{
+      data: VC_DATA.map(v => v.n),
+      backgroundColor: VC_DATA.map(vcColor),
+      borderRadius: 4,
+      barPercentage: 0.72
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    interaction: { mode: 'index', axis: 'y', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        enabled: true,
+        ...tooltipStyle,
+        callbacks: {
+          title: (ctx) => ctx[0].label,
+          label: (ctx) => {
+            const v = VC_DATA[ctx.dataIndex];
+            return [
+              v.n + ' UK semi / photonics / quantum investments',
+              v.type + ' \u00B7 ' + v.country,
+              '',
+              'Notable: ' + v.top.join(', ')
+            ];
+          }
+        }
+      }
+    },
+    layout: { padding: { left: 4, right: 8 } },
+    scales: {
+      x: { grid: { color: '#F1F5F9' }, ticks: { precision: 0, stepSize: 2 }, title: { display: true, text: 'UK semi portfolio count', font: { size: 10 }, color: '#94A3B8' } },
+      y: { grid: { display: false }, ticks: { font: { size: 10 }, autoSkip: false, crossAlign: 'far', padding: 4 }, afterFit: (scale) => { scale.width = Math.max(scale.width, 170); } }
     }
   }
 });
